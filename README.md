@@ -1,6 +1,6 @@
 <img src="docs/img/banner.svg" alt="CONTINUUM: one manufacturer notice in, one program decision out" width="100%">
 
-[![tests](https://github.com/parisproffitt/DefenseObsolescenceIntelligence/actions/workflows/tests.yml/badge.svg)](https://github.com/parisproffitt/DefenseObsolescenceIntelligence/actions/workflows/tests.yml) &nbsp;Palantir Foundry + AIP · Python · MIT
+[![tests](https://img.shields.io/github/actions/workflow/status/parisproffitt/DefenseObsolescenceIntelligence/tests.yml?branch=main&label=tests&style=flat-square&color=FF5B1F&labelColor=08090A)](https://github.com/parisproffitt/DefenseObsolescenceIntelligence/actions/workflows/tests.yml) &nbsp;Palantir Foundry + AIP · Python · MIT
 
 **CONTINUUM** helps defense sustainment engineers act on parts obsolescence. It reads a manufacturer's end-of-life notice, finds every program that depends on the discontinued parts, forecasts how many will be needed with an honest uncertainty range, and lays out costed options for the engineer to approve.
 
