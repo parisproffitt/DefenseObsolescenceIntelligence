@@ -35,7 +35,9 @@ declares a replacement compatible and never computes numbers in prose.
   Foundry through it; mirror any Foundry-side code into `foundry/` in this repo.
 - The design deck is a Claude Slides artifact: https://claude.ai/artifact/EL6ZbRX4M1vGhug25MaYwh
   Keep it in sync: read it with the Artifact tool, edit only the affected slides
-  (`project/slides/<id>.html`), republish to that URL. Match its dark console style.
+  (`project/slides/<id>.html`), republish to that URL. Style: near-black #08090A, off-white
+  #EDEDEA, grays #B8BBBF/#8B8F94, ONE signal color #FF5B1F for critical items only;
+  Inter Tight + JetBrains Mono; doc-ID header and page number on every slide (17 slides).
 
 ## Definition of done (work through in order, without stopping to ask)
 1. **Phase 1, data** (`docs/FOUNDRY_BUILD.md`): Python transforms in the Continuum
