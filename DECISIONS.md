@@ -92,3 +92,15 @@ Newest decisions are appended at the bottom.
 - **Why:** Recall answers "did it miss a part that affects a program?" (the costly error); precision answers "did it invent one?". Normalizing first means the score measures extraction, not whitespace or case. Verbatim quotes let the engineer check any row in seconds.
 - **Alternative:** An LLM-as-judge rating of the extraction, or one overall accuracy number.
 - **Why rejected:** The answer key is exact, so exact comparison is cheaper and unambiguous; one number would hide whether errors are misses or inventions.
+
+### D-15 · What the Palantir MCP can build, and what stays manual
+- **Decision:** Build everything the `palantir` MCP server can reach through it, and write exact click-paths for the rest into `docs/MANUAL_STEPS.md`. Tools available on 2026-09-26 (93), grouped by the definition-of-done step they serve:
+  - **Step 1 (data):** `create_python_transforms_code_repository`, `clone_code_repository_locally`, `get_repository_context`, `get_python_transforms_documentation`, `build_datasets`, `get_build_status`, `get_job_status`, `search_dataset_builds`, `create_and_write_to_foundry_dataset` (CSV upload), `run_sql_query_on_foundry_dataset`, `get_dataset_stats`, `get_foundry_dataset_schema`, `list_dataset_files`, `list_resources_in_foundry_folder`, `search_foundry_resources`, `search_foundry_projects`, `move_foundry_resources`, `get_resource_graph`, `create_code_repository_pull_request` and PR tools.
+  - **Step 2 (Ontology):** `create_or_update_foundry_object_type`, `create_or_update_foundry_link_type`, `view_/delete_foundry_object_type`, `view_/delete_foundry_link_type`, `get_foundry_ontology_rid`, `search_foundry_ontology`, `query_ontology_objects`, `aggregate_ontology_objects`, global branch / proposal tools.
+  - **Step 3 (logic):** the same transforms tools as step 1 (`impact`, `forecast`, `coa` run as Python transforms).
+  - **Step 4 (AIP):** no tool creates or runs an AIP Logic function. Nearest: TypeScript / Python functions (`get_typescript_v2_functions_documentation`, `publish_function`, `search_foundry_functions`), `get_ml_documentation`, media-set tools (`get_media_set`, `list_media_items`, `get_media_item_metadata`), documentation search.
+  - **Step 5 (Action + app):** `create_or_update_foundry_action_type`, `view_/delete_foundry_action_type`. No Workshop tool; OSDK / Developer Console tools (`create_or_update_ontology_sdk_version`, `convert_to_osdk_react`, `connect_to_dev_console_app`) could build a custom app instead.
+  - **Not used:** compute modules, REST data sources and webhooks, health checks, network egress, custom widgets, SDK package install.
+- **Why:** The brief asks for a Foundry build, and every choice must be explainable. Knowing up front which steps the tools reach avoids pretending a step is automated when it is not.
+- **Alternative:** Build everything by hand in the Foundry UI, or skip what the MCP cannot reach.
+- **Why rejected:** Hand-building loses the repo mirror and reproducibility; skipping leaves the demo incomplete.
