@@ -86,3 +86,9 @@ Newest decisions are appended at the bottom.
 - **Why:** An extraction accuracy number is only as good as its answer key.
 - **Alternative:** Trust the transcription.
 - **Why rejected:** "How do you know your ground truth is right?" deserves a better answer than "I read it carefully."
+
+### D-14 · AIP extraction is scored field by field, with the same normalizer as matching
+- **Decision:** `eval_extraction.score` grades AIP's notice output against the real parts lists: part recall and precision, LTB/LTS date accuracy, replacement accuracy, and citation coverage, per notice and pooled. Part numbers pass through `normalize()` first. The prompt (`docs/AIP_LOGIC.md`) forbids invented parts, dates or replacements, and requires a verbatim quote per row.
+- **Why:** Recall answers "did it miss a part that affects a program?" (the costly error); precision answers "did it invent one?". Normalizing first means the score measures extraction, not whitespace or case. Verbatim quotes let the engineer check any row in seconds.
+- **Alternative:** An LLM-as-judge rating of the extraction, or one overall accuracy number.
+- **Why rejected:** The answer key is exact, so exact comparison is cheaper and unambiguous; one number would hide whether errors are misses or inventions.

@@ -82,12 +82,14 @@ src/continuum/
   impact.py        notice -> impact cases, coverage/gap/severity, review flags
   coa.py           courses of action, holding cost, growth stress test
   raw.py           messy raw exports for Foundry ingestion
+  eval_extraction.py  scores AIP notice extraction against ground truth
 scripts/build_all.py   generates everything into output/ (Foundry upload set)
 data/notices/          notice registry + sources
 data/reference/        real affected-part lists (ground truth)
-tests/                 22 pytest cases, incl. the demo story's numbers
+tests/                 27 pytest cases, incl. the demo story's numbers
 DECISIONS.md           design decision log
 docs/FOUNDRY_BUILD.md  exact Foundry / AIP build steps
+docs/AIP_LOGIC.md      extraction prompt, output schema, evaluation
 ```
 
 ```bash
@@ -118,7 +120,7 @@ Upload `output/*.csv` as datasets, then create these object types ([D-11](DECISI
 | Here | In Foundry |
 |---|---|
 | `partnumbers.py`, `impact.py`, `coa.py` | Python transforms / Functions (Code Repositories) |
-| Notice PDF to structured lines | AIP Logic, evaluated against `notice_lines` |
+| Notice PDF to structured lines | AIP Logic ([spec](docs/AIP_LOGIC.md)), scored by `eval_extraction.py` against `notice_lines` |
 | COA narrative and decision memo | AIP Logic over computed COA values |
 | Engineer's choice | Ontology Action: create Procurement Request and Engineering Review, set Impact Case `status` |
 
