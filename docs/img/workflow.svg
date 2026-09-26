@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-label="How CONTINUUM works, in six steps: AIP reads the notice; code matches parts to bills of materials; code measures impact; ML forecasts demand as a calibrated range; AIP lays out costed options; the engineer decides and an Ontology Action writes the decision back.">
+  <rect width="1200" height="760" fill="#08090A"/>
+  <g font-family="'JetBrains Mono', Menlo, Consolas, monospace">
+    <text x="56" y="64" font-size="16" letter-spacing="3" fill="#FF5B1F">HOW IT WORKS · NOTICE → DECISION</text>
+    <text x="1144" y="64" font-size="16" letter-spacing="2" fill="#8B8F94" text-anchor="end">WHO DOES IT</text>
+  </g>
+  <line x1="56" y1="88" x2="1144" y2="88" stroke="#EDEDEA" stroke-width="1"/>
+  <line x1="76" y1="150" x2="76" y2="670" stroke="#2A2D31" stroke-width="2"/>
+
+  <g font-family="'Inter Tight', Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+    <!-- 01 -->
+    <circle cx="76" cy="150" r="7" fill="#EDEDEA"/>
+    <text x="110" y="157" font-family="'JetBrains Mono', Menlo, monospace" font-size="18" fill="#8B8F94">01</text>
+    <text x="160" y="159" font-size="28" font-weight="600" fill="#EDEDEA">Read the notice</text>
+    <text x="500" y="158" font-size="21" fill="#B8BBBF">Parts, dates and caveats, each with a quote</text>
+    <rect x="1040" y="132" width="104" height="36" fill="#EDEDEA"/>
+    <text x="1092" y="157" text-anchor="middle" font-family="'JetBrains Mono', Menlo, monospace" font-size="17" font-weight="600" fill="#08090A">AIP</text>
+    <line x1="56" y1="202" x2="1144" y2="202" stroke="#2A2D31"/>
+    <!-- 02 -->
+    <circle cx="76" cy="254" r="7" fill="#EDEDEA"/>
+    <text x="110" y="261" font-family="'JetBrains Mono', Menlo, monospace" font-size="18" fill="#8B8F94">02</text>
+    <text x="160" y="263" font-size="28" font-weight="600" fill="#EDEDEA">Match to BOMs</text>
+    <text x="500" y="262" font-size="21" fill="#B8BBBF">Exact identity; near-misses flagged for review</text>
+    <rect x="1040.5" y="236.5" width="103" height="35" fill="none" stroke="#EDEDEA"/>
+    <text x="1092" y="261" text-anchor="middle" font-family="'JetBrains Mono', Menlo, monospace" font-size="17" font-weight="600" fill="#EDEDEA">CODE</text>
+    <line x1="56" y1="306" x2="1144" y2="306" stroke="#2A2D31"/>
+    <!-- 03 -->
+    <circle cx="76" cy="358" r="7" fill="#EDEDEA"/>
+    <text x="110" y="365" font-family="'JetBrains Mono', Menlo, monospace" font-size="18" fill="#8B8F94">03</text>
+    <text x="160" y="367" font-size="28" font-weight="600" fill="#EDEDEA">Measure impact</text>
+    <text x="500" y="366" font-size="21" fill="#B8BBBF">Coverage, supply gap and severity, traceable</text>
+    <rect x="1040.5" y="340.5" width="103" height="35" fill="none" stroke="#EDEDEA"/>
+    <text x="1092" y="365" text-anchor="middle" font-family="'JetBrains Mono', Menlo, monospace" font-size="17" font-weight="600" fill="#EDEDEA">CODE</text>
+    <line x1="56" y1="410" x2="1144" y2="410" stroke="#2A2D31"/>
+    <!-- 04 -->
+    <circle cx="76" cy="462" r="7" fill="#EDEDEA"/>
+    <text x="110" y="469" font-family="'JetBrains Mono', Menlo, monospace" font-size="18" fill="#8B8F94">04</text>
+    <text x="160" y="471" font-size="28" font-weight="600" fill="#EDEDEA">Forecast demand</text>
+    <text x="500" y="470" font-size="21" fill="#B8BBBF">A calibrated range, not a single guess</text>
+    <rect x="1040.5" y="444.5" width="103" height="35" fill="none" stroke="#EDEDEA" stroke-dasharray="6 4"/>
+    <text x="1092" y="469" text-anchor="middle" font-family="'JetBrains Mono', Menlo, monospace" font-size="17" font-weight="600" fill="#EDEDEA">ML</text>
+    <line x1="56" y1="514" x2="1144" y2="514" stroke="#2A2D31"/>
+    <!-- 05 -->
+    <circle cx="76" cy="566" r="7" fill="#EDEDEA"/>
+    <text x="110" y="573" font-family="'JetBrains Mono', Menlo, monospace" font-size="18" fill="#8B8F94">05</text>
+    <text x="160" y="575" font-size="28" font-weight="600" fill="#EDEDEA">Lay out options</text>
+    <text x="500" y="574" font-size="21" fill="#B8BBBF">Costed options, explained in plain words</text>
+    <rect x="1040" y="548" width="104" height="36" fill="#EDEDEA"/>
+    <text x="1092" y="573" text-anchor="middle" font-family="'JetBrains Mono', Menlo, monospace" font-size="17" font-weight="600" fill="#08090A">AIP</text>
+    <line x1="56" y1="618" x2="1144" y2="618" stroke="#2A2D31"/>
+    <!-- 06 -->
+    <circle cx="76" cy="670" r="9" fill="#FF5B1F"/>
+    <text x="110" y="677" font-family="'JetBrains Mono', Menlo, monospace" font-size="18" fill="#FF5B1F">06</text>
+    <text x="160" y="679" font-size="28" font-weight="600" fill="#EDEDEA">Decide and act</text>
+    <text x="500" y="678" font-size="21" fill="#B8BBBF">Engineer approves; the Ontology updates</text>
+    <rect x="1040" y="652" width="104" height="36" fill="#FF5B1F"/>
+    <text x="1092" y="677" text-anchor="middle" font-family="'JetBrains Mono', Menlo, monospace" font-size="17" font-weight="600" fill="#08090A">HUMAN</text>
+  </g>
+  <line x1="56" y1="722" x2="1144" y2="722" stroke="#EDEDEA" stroke-width="1"/>
+</svg>
