@@ -9,8 +9,10 @@ Stated assumptions (notional, surfaced in the UI rather than hidden):
 - HOLDING_RATE: annual cost of storing stock (warehousing, handling, capital),
   applied to the average inventory value over the COA window.
 - The bootstrap assumes recent demand persists. For multi-decade buys that is
-  the weakest assumption, so each COA also reports shortage risk if the
-  historical growth trend continues.
+  the weakest assumption, so each COA also reports shortage risk under a stated
+  demand-growth stress scenario (STRESS_GROWTH, adjustable by the engineer).
+  A trend fitted to ~6 years of lumpy demand is too noisy to use directly
+  (about +/-11 points RMSE in simulation; see DECISIONS.md D-10).
 """
 
 from __future__ import annotations
@@ -26,6 +28,7 @@ from .forecast import bootstrap_samples
 BRIDGE_SERVICE_LEVEL = 0.85    # target P(no shortage) for the hybrid bridge buy
 LIFETIME_SERVICE_LEVEL = 0.90  # target P(no shortage) for a life-of-type buy
 HOLDING_RATE = 0.05            # per year, fraction of inventory value
+STRESS_GROWTH = 0.05           # per year, aging-fleet demand-growth stress scenario
 ORDER_MULTIPLE = 10
 
 
@@ -34,7 +37,11 @@ def _round_up(q: float, multiple: int = ORDER_MULTIPLE) -> int:
 
 
 def annual_growth(history: np.ndarray) -> float:
-    """Demand growth per year from a log-linear fit of annual totals (clipped to +/-20%)."""
+    """Demand growth per year from a log-linear fit of annual totals (clipped to +/-20%).
+
+    Displayed for context only: on ~6 years of lumpy demand its error is about
+    +/-11 points, so it does not drive decisions (see STRESS_GROWTH).
+    """
     years = len(history) // 12
     if years < 2:
         return 0.0
@@ -74,7 +81,7 @@ class COA:
     total_usd: float
     window_months: int
     p_shortage: float
-    p_shortage_if_trend_continues: float
+    p_shortage_under_stress: float
     expected_shortfall_units: float
     expected_excess_usd: float
     summary: str
@@ -88,10 +95,11 @@ def build_coas(
     redesign_nre_usd: float,
     remaining_life_months: int,
     seed: int = 0,
+    stress_growth: float = STRESS_GROWTH,
 ) -> list[COA]:
     bridge = bootstrap_samples(history, redesign_lead_months, seed=seed)
     life = bootstrap_samples(history, remaining_life_months, seed=seed + 1)
-    g = annual_growth(history)
+    g = stress_growth
     bridge_trend = bridge * trend_multiplier(g, redesign_lead_months)
     life_trend = life * trend_multiplier(g, remaining_life_months)
 
@@ -118,8 +126,8 @@ def build_coas(
             lot_qty * unit_cost + lot_hold, remaining_life_months, lot["p_shortage"],
             p_trend(life_trend, lot_qty), lot["expected_shortfall_units"], lot["expected_excess_usd"],
             f"Buy {lot_qty} units to cover {years} years of support at {LIFETIME_SERVICE_LEVEL:.0%} confidence. "
-            f"No engineering change, but relies on a {years}-year demand forecast: if the {g:+.0%}/yr "
-            f"trend continues, shortage risk rises to {p_trend(life_trend, lot_qty):.0%}."),
+            f"No engineering change, but relies on a {years}-year demand forecast: if demand grows {g:.0%}/yr "
+            f"as the fleet ages, shortage risk rises to {p_trend(life_trend, lot_qty):.0%}."),
         COA("COA-2", "Redesign only (no buy)", 0, 0.0, 0.0, redesign_nre_usd, redesign_nre_usd,
             redesign_lead_months, red["p_shortage"], p_trend(bridge_trend, 0),
             red["expected_shortfall_units"], 0.0,

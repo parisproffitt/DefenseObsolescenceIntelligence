@@ -51,8 +51,8 @@ Newest decisions are appended at the bottom.
 - **Also:** The generator has no autocorrelation, so block size cannot be validated on this data. `block=1` is the default; longer blocks remain an option for real, batch-driven repair demand.
 
 ### D-08 · COAs carry holding cost and a trend-sensitivity check
-- **Decision:** Each course of action reports procurement, holding (5%/yr of average inventory value, a stated assumption), and engineering cost, plus shortage risk under flat demand **and** if the historical growth trend continues.
-- **Why:** Without these, a 17-year life-of-type buy looks cheapest and safe. With them, it costs about the same as the hybrid and carries near-certain shortage risk if Heron's +6%/yr aging trend continues. That is the real reason an engineer would choose a bridge buy plus redesign.
+- **Decision:** Each course of action reports procurement, holding (5%/yr of average inventory value, a stated assumption), and engineering cost, plus shortage risk under flat demand **and** under a demand-growth stress scenario (D-10).
+- **Why:** Without these, a 17-year life-of-type buy looks cheapest and safe. With them, it costs about the same as the hybrid ($1.53M vs $1.55M), and its shortage risk jumps from 10% to 99% if demand grows 5%/yr as the fleet ages. The hybrid moves only from 14% to 18%. That is the real reason an engineer would choose a bridge buy plus redesign.
 - **Alternative:** Rank COAs by procurement cost only.
 - **Why rejected:** It hides the long-horizon forecast bet that dominates the decision.
 
@@ -61,3 +61,9 @@ Newest decisions are appended at the bottom.
 - **Why:** Every number shown to the engineer must trace back to its inputs.
 - **Alternative:** Have the LLM compute or estimate figures in its narrative.
 - **Why rejected:** Unverifiable arithmetic in a procurement decision.
+
+### D-10 · Stress-test demand growth with a stated scenario, not a fitted trend
+- **Decision:** Shortage risk under growth uses an explicit, adjustable assumption (`STRESS_GROWTH = 5%/yr`), not a trend estimated from history.
+- **Why:** My first version used a fitted trend. For Heron it returned +17%/yr, while the generator's true trend is +6%. In a 300-series simulation, both a log-linear fit and a Poisson regression were unbiased but off by about 11 points (RMSE) on 6 years of lumpy demand. That is too noisy to put in a procurement decision.
+- **Alternative:** Use the fitted trend, or hide growth risk entirely.
+- **Why rejected:** The first overstates risk from noise; the second hides the biggest weakness of a multi-decade buy. A stated scenario is transparent, and the engineer can change it.

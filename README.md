@@ -40,11 +40,13 @@ Scenario date **2025-06-10**, replaying Microchip's real notice **CAAN-02OLLE763
 
 **Heron courses of action** (notional costs):
 
-| COA | Buy | Total cost | Shortage risk | …if the +6%/yr trend continues |
+| COA | Buy | Total cost | Shortage risk | …if demand grows 5%/yr (stress) |
 |---|---|---|---|---|
-| Life-of-type buy | 5,640 | $1.53M | 10% | ~100% |
-| Redesign only | 0 | $1.45M | 93% | 97% |
-| **Bridge buy + redesign** | **500** | **$1.55M** | **14%** | **29%** |
+| Life-of-type buy | 5,640 | $1.53M | 10% | 99% |
+| Redesign only | 0 | $1.45M | 93% | 94% |
+| **Bridge buy + redesign** | **500** | **$1.55M** | **14%** | **18%** |
+
+The life-of-type buy looks cheapest until you add holding cost and ask what happens if an aging fleet consumes parts faster. It bets 17 years of support on one forecast. The hybrid costs about the same and only has to be right for 24 months.
 
 ## Forecast evaluation (held-out, 12-month cumulative demand)
 

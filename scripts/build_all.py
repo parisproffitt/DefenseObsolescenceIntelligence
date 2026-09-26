@@ -87,7 +87,7 @@ def main() -> None:
     print(f"\nDEMO CASE: {demo.rationale}")
     print("\nCOURSES OF ACTION")
     print(cf[["coa_id", "name", "buy_qty", "procurement_usd", "holding_usd", "engineering_usd", "total_usd",
-              "p_shortage", "p_shortage_if_trend_continues"]]
+              "p_shortage", "p_shortage_under_stress"]]
           .round(3).to_string(index=False))
     print(f"\nFORECAST BACKTEST (12-month cumulative demand, held-out origins; fitted spread={fitted})")
     print(summary[["evaluation", "method", "n", "mae", "mae_vs_naive", "p10_p90_coverage"]]
