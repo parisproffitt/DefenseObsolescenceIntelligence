@@ -1,5 +1,7 @@
 # CONTINUUM — Obsolescence Intelligence for Defense Sustainment
 
+[![tests](https://github.com/parisproffitt/DefenseObsolescenceIntelligence/actions/workflows/tests.yml/badge.svg)](https://github.com/parisproffitt/DefenseObsolescenceIntelligence/actions/workflows/tests.yml)
+
 Built on Palantir Foundry and AIP, CONTINUUM turns manufacturer end-of-life notices into program-level impact analysis, uncertainty-aware demand forecasts, and human-approved mitigation decisions.
 
 > Defense systems serve for 25–30+ years. The commercial electronics inside them are supported for 4–7. When a part is discontinued, the manufacturer publishes a notice, usually a PDF. An engineer then has to work out what that one document means for every program that depends on it, before the last-time-buy window closes. The DoD calls this **DMSMS** (Diminishing Manufacturing Sources and Material Shortages).
@@ -76,7 +78,7 @@ src/continuum/
   generate.py      notional programs/BOMs/inventory/demand + evaluation corpus
   forecast.py      baselines, bootstrap, calibration, rolling-origin backtest
   impact.py        notice -> impact cases, coverage/gap/severity, review flags
-  coa.py           courses of action, holding cost, trend sensitivity
+  coa.py           courses of action, holding cost, growth stress test
 scripts/build_all.py   generates everything into output/ (Foundry upload set)
 data/notices/          notice registry + sources
 data/reference/        real affected-part lists (ground truth)
@@ -117,3 +119,5 @@ Upload `output/*.csv` as datasets, then create these object types ([D-11](DECISI
 | Engineer's choice | Ontology Action: create Procurement Request and Engineering Review, set Impact Case `status` |
 
 *Programs Heron, Kite, and Petrel are fictional. No employer data is used.*
+
+Licensed under the [MIT License](LICENSE).
