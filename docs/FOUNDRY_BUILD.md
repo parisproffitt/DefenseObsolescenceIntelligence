@@ -55,43 +55,49 @@ The lineage graph (raw → clean → analysis) and the `bom_notice_matches` prev
 - Intel: the OPN list linked from PDN2401 (cdrdv2.intel.com/v1/dl/getContent/813534).
 Commit both to `data/reference/official/`; a test compares them to our lists.
 
-## Phase 2 — Ontology (Ontology Manager)
+## Phase 2 — Ontology — BUILT (on a branch; merge is manual)
 
-Create object types from the `clean/` datasets (and the computed uploads):
+Built through the MCP on global branch `continuum-ontology`; the exact ids, API names
+and datasets are in [`foundry/ONTOLOGY.md`](../foundry/ONTOLOGY.md) (D-17).
 
 | Object type | Dataset | Primary key | Title |
 |---|---|---|---|
-| Program | `programs` | `program_id` | `name` |
-| Assembly | `assemblies` | `assembly_id` | `name` |
-| Part | `parts` | `part_number` | `part_number` |
-| BOM Line | `bom_lines` | `bom_line_id` | `part_number` |
-| Inventory Position | `inventory` | `inventory_id` | `inventory_id` |
-| Notice | `notices` | `notice_id` | `notice_id` |
-| Notice Line | `notice_lines` | `notice_line_id` | `part_number` |
-| Impact Case | `impact_cases` | `case_id` | `case_id` |
-| Review Flag | `review_flags` | `flag_id` | `flag_type` |
-| Course of Action | `coas` | `coa_key` | `name` |
+| Program | `clean/programs` | `program_id` | `name` |
+| Assembly | `clean/assemblies` | `assembly_id` | `name` |
+| Part | `clean/parts` | `part_number` | `part_number` |
+| BOM Line | `clean/bom_lines` | `bom_line_id` | `part_number` |
+| Inventory Position | `clean/inventory` | `inventory_id` | `inventory_id` |
+| Notice | `clean/notices` | `notice_id` | `notice_id` |
+| Notice Line | `clean/notice_lines` | `notice_line_id` | `part_number` |
+| Impact Case | `analysis/impact_cases` | `case_id` | `title` |
+| Review Flag | `analysis/review_flags` | `flag_id` | `flag_type` |
+| Course of Action | `analysis/coas` | `coa_key` | `name` |
 
-Link types (all many-to-one, foreign key on the first object):
+Link types (all one-to-many, foreign key on the first object): Assembly → Program,
+BOM Line → Assembly, BOM Line → Part, Inventory Position → Program, Inventory
+Position → Part, Notice Line → Notice, Impact Case → Program, Impact Case → Notice,
+Impact Case → Part, Review Flag → Notice, **Review Flag → Program, Review Flag → Part**
+(the last two added so the README's link list holds), Course of Action → Impact Case.
 
-| From | To | Key |
-|---|---|---|
-| Assembly | Program | `program_id` |
-| BOM Line | Assembly | `assembly_id` |
-| BOM Line | Part | `part_number` |
-| Inventory Position | Program | `program_id` |
-| Inventory Position | Part | `part_number` |
-| Notice Line | Notice | `notice_id` |
-| Impact Case | Program | `program_id` |
-| Impact Case | Notice | `notice_id` |
-| Impact Case | Part | `part_number` |
-| Review Flag | Notice | `notice_id` |
-| Course of Action | Impact Case | `case_id` |
+**Manual:** approve the branch's proposal (`docs/MANUAL_STEPS.md`). **Check:** open
+Heron in Object Explorer and follow Program → Assembly → BOM Line → Part.
 
-**Check:** open Heron in the object explorer and follow Program → Assembly → BOM Line → Part.
+## Phase 3 — Decision logic in Foundry — BUILT
 
-## Phase 3 — Logic in Foundry (next)
-- AIP Logic: notice PDF → notice lines, scored against `notice_lines`.
-- Code Repositories: port `impact.py`, `forecast.py`, `coa.py` as Python transforms.
-- Action type: *Approve course of action* → set Impact Case `status`, create Procurement Request and Engineering Review.
-- Workshop: Dana's app.
+`analysis.py` runs the reference modules unchanged (`impact.py`, `forecast.py`,
+`coa.py`), reading only the clean tables:
+
+| Transform | Outputs (`analysis/`) |
+|---|---|
+| `impact` | `impact_cases` (5; plus `status = OPEN`, a readable `title`, and P10/P50/P90 demand over each case's redesign window), `review_flags` (2) |
+| `courses_of_action` | `coas` (3 per CRITICAL case) and `tradeoff_curve` (81 rows per case) |
+| `forecast_evaluation` | `backtest_summary`, `calibration_table` (D-07, held-out origins) |
+
+**Verified in Foundry by SQL (2026-09-26):** Heron `A3P1000-1PQG208I`: 312 on hand,
+13.8 mo coverage, 5.7 mo to LTB, 24 mo redesign, 10.2 mo gap, CRITICAL. COAs:
+life-of-type 5,640 / $1,525,140 / 9.8% / 99.15%; redesign only 0 / $1,450,000 / 92.9% /
+94.3%; **hybrid 500 / $1,550,011 / 14.25% / 18.15%**, identical to the reference run.
+Heron's forecast range over the 24-month window is P10 337, P50 573, P90 880 units.
+
+## Phase 4 — AIP, Action, app
+See `docs/AIP_LOGIC.md` (extraction and its evaluation) and `docs/MANUAL_STEPS.md`.

@@ -110,3 +110,10 @@ Newest decisions are appended at the bottom.
 - **Why:** Cleaning and matching now share one function, so a part number that cleans one way cannot match another way; the tests that pin `normalize()` also pin the Foundry cleaning. A duplicate key fails the build before it can reach the Ontology. And the MCP can create transforms but not Pipeline Builder pipelines, so this path is reproducible from the repo.
 - **Alternative:** Pipeline Builder with trim / upper-case / regex boards (D-12's plan), or uploading the clean CSVs.
 - **Why rejected:** Pipeline Builder would re-implement the normalizer in a second place that tests cannot reach. Uploading clean files hides the integration work. The lineage graph still shows raw → clean → analysis, which is what D-12 wanted.
+
+### D-17 · Ontology built on a global branch, merged by a person
+- **Decision:** All object and link types are created through the MCP on one global branch (`continuum-ontology`) and reach the main Ontology only when Paris approves its proposal. Impact Case's title is a readable `title` ("Heron · A3P1000-1PQG208I · CRITICAL") rather than the raw `case_id`. Review Flag links to Program and Part as well as Notice, as the README's Ontology table says.
+- **Why:** An Ontology change is shared state other apps can depend on, so the same rule as the product applies: the machine proposes, a person approves. The readable title is what Dana scans in a list; the key stays the stable `case_id`. Linking flags to programs lets the Heron page show its own flags.
+- **Alternative:** Write straight to the main Ontology; title by `case_id`; link flags only to notices.
+- **Why rejected:** No review step for a shared model; `IC-CAAN-02OLLE763-HERON-A3P1000-1PQG208I` is unreadable in a list; flags would be unreachable from the program page.
+- **Also:** Foundry prefixes every id with the namespace `one4jwoo.`; `foundry/ONTOLOGY.md` records the ids exactly.
