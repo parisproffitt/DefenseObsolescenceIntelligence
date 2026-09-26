@@ -1,0 +1,136 @@
+# Manual steps
+
+These are the steps the Palantir MCP cannot do (D-15). Everything around them was built
+through the MCP and is mirrored in `foundry/`. Do them in order; each says how to check
+it worked. Foundry host: `https://continuum-demo.usw-17.palantirfoundry.com`.
+Project: `/CONTINUUM-edbe5f/Continuum`.
+
+<!-- Sections are appended as the build reaches each step. -->
+
+## 1. Approve the Ontology proposal (Phase 2 + the action)
+Everything Ontology-side was created on global branch **continuum-ontology**.
+1. Open Foundry → **Ontology Manager** → branch selector (top bar) → **continuum-ontology**,
+   or open the proposal link the MCP returned (recorded in `foundry/ONTOLOGY.md`).
+2. Review: 12 object types, 13 link types, 1 action type (*Approve course of action*).
+3. **Approve** and **Merge**. Wait for the object indexes to finish (Ontology Manager →
+   each object type → Datasources shows "Up to date").
+- **Check:** Object Explorer → search "Heron" → Program *Heron* → Assemblies (3) →
+  *Mission Computer Processor Card* → BOM Lines → `A3P1000-1PQG208I` → Part. Then Heron →
+  Impact Cases: 2 (one CRITICAL, one WATCH).
+
+## 2. Run the AIP extraction evaluation, then build `extractNoticeLines` (step 4)
+The MCP cannot add the language-model libraries: editing `meta.yaml` fails dependency
+resolution for both `palantir_models` and `language-model-service-api` (D-19). The
+evaluation code is written and waiting in
+`foundry/continuum-transforms/pending/aip_extraction.py`; it needs the libraries and
+two model RIDs.
+
+**2a. Add the libraries (5 min).** Open repository `continuum-transforms` →
+left sidebar **Libraries** → search `palantir_models` → **Add and install library**;
+repeat for `language-model-service-api`. Wait for checks to pass.
+
+**2b. Pick the two models.** In the same repository, type
+`OpenAiGptChatLanguageModelInput("ri.` in any file and the picker lists the models
+enabled here. Choose one small (e.g. GPT-4.1 nano / GPT-5 nano) and one frontier
+(e.g. GPT-4.1 / GPT-5). If only Anthropic models are enabled, use
+`AnthropicClaudeLanguageModelInput` instead and adapt `_completer` (same two
+arguments, same return: the reply text).
+
+**2c. Drop in the evaluation.** Copy `pending/aip_extraction.py` to
+`transforms-python/src/myproject/datasets/aip_extraction.py`, set the two RIDs in
+`MODELS`, commit. Build `aip_extraction.py` (all three transforms).
+- **Check / record:** `aip/extraction_scores` has one `POOLED` row per model × mode.
+  Copy recall, precision, LTB/LTS accuracy, replacement accuracy and citation coverage
+  into `docs/AIP_LOGIC.md` → *Results*, and onto the deck's AIP evaluation slide
+  (the `[__]` placeholders). `aip/extraction_*_calls` shows any call that failed to parse;
+  report those, do not drop them.
+
+**2d. Build the interactive function.**
+1. Project `Continuum` → **New → AIP Logic** → `extractNoticeLines`, saved in
+   `/CONTINUUM-edbe5f/Continuum/aip`.
+2. **Inputs:** `noticeId` (String), `noticeText` (String).
+3. **Output:** a list of structs `notice_id`, `part_number`, `last_time_buy` (Date),
+   `last_time_ship` (Date), `replacement_part_number`, `source_quote` (strings unless stated).
+4. **Use LLM** block, the model 2c kept, temperature 0. System prompt: `docs/AIP_LOGIC.md`
+   verbatim (identical to `SYSTEM_PROMPT` in `src/continuum/extraction.py`). Task prompt:
+   the schema block from `extraction.SCHEMA`, then `notice_id: {noticeId}`, a blank
+   line, `Notice text:`, and `{noticeText}`.
+5. **Test** with `CAAN-02OLLE763` and `raw/raw_notice_text` pages p01–p06 joined.
+- **Check:** 110 rows; every `last_time_buy` = 2025-12-01; `A3P1000-1PQG208I` present
+  with a quote; the caveat about qualifying a new assembly site copied verbatim.
+
+## 3. Finish the *Approve course of action* action (step 5)
+The MCP created the action (`approve-course-of-action`,
+`ri.actions.main.action-type.1d070cf4-1ac9-4bf0-b391-192fb695de6e`) with its core rule:
+*modify Impact Case → `status`* (dropdown: `APPROVED: …` / `OPEN`). Add the rest in
+**Ontology Manager → Action types → Approve course of action** (on branch
+`continuum-ontology` before merging, or on main after):
+1. **Parameters → Add → Object reference** `course_of_action`, type *Course of Action*,
+   required. Filter: *Course of Action.case_id = Impact Case parameter.case_id*.
+2. Make `status` default to `"APPROVED: " + course_of_action.name` (Parameter →
+   Default value → Object parameter property → `name`, with a static prefix), and hide it.
+3. **Rules → Add rule → Create object → Procurement Request**:
+   `request_id` = UUID (auto-generated) · `case_id` = Impact Case.case_id ·
+   `coa_key` = course_of_action.coa_key · `program_id` = Impact Case.program_id ·
+   `part_number` = Impact Case.part_number · `quantity` = course_of_action.buy_qty ·
+   `estimated_cost_usd` = course_of_action.procurement_usd · `status` = `"DRAFT"` ·
+   `requested_by` = current user · `requested_at` = current time ·
+   `justification` = course_of_action.summary.
+4. **Rules → Add rule → Create object → Engineering Review**:
+   `review_id` = UUID · `case_id`, `coa_key`, `program_id`, `part_number` as above ·
+   `review_type` = `"Replacement qualification / redesign"` · `status` = `"OPEN"` ·
+   `opened_by` = current user · `opened_at` = current time ·
+   `notes` = Impact Case.rationale.
+5. **Submission criteria:** Impact Case.status equals `OPEN` (a decided case can't be
+   approved twice). Save.
+- **Check:** run the action on Heron / *Bridge buy + redesign (hybrid)*. The case's
+  status becomes `APPROVED: Bridge buy + redesign (hybrid)`; one Procurement Request
+  with quantity **500** and cost **$92,500** and one Engineering Review exist, both
+  linked to the case.
+
+## 4. Build Dana's Workshop app (step 5)
+No MCP tool builds Workshop modules. The Ontology gives the app everything it needs,
+so this is layout only: no logic lives in the app (D-09). About 30 minutes.
+**New → Workshop module** `CONTINUUM – Obsolescence decisions`, saved in
+`/CONTINUUM-edbe5f/Continuum/apps`. Dark theme. One page, three columns.
+
+**Variables**
+- `cases` = object set: all **Impact Case**, sorted by `gap_months` desc then `coverage_months` asc.
+- `selectedCase` = active object of the Impact Cases table (default: first row, i.e. Heron).
+- `caseCoas` = `selectedCase` → Search Around → **Courses of Action**.
+- `selectedCoa` = active object of the COA table.
+- `caseFlags` = `selectedCase` → Program → **Review Flags**.
+
+**Left: "Impact cases"**: *Object table* on `cases`. Columns: `title`, `severity`,
+`coverage_months`, `months_to_ltb`, `gap_months`, `status`. Conditional formatting:
+`severity = CRITICAL` → text color `#FF5B1F`; everything else default.
+
+**Middle: "Heron detail" (selected case)**
+1. *Metric cards* on `selectedCase`: **On hand** `on_hand` · **Coverage** `coverage_months` (mo) ·
+   **Last-time buy in** `months_to_ltb` (mo) · **Redesign** `redesign_lead_time_months` (mo) ·
+   **Supply gap** `gap_months` (mo, orange when > 0).
+2. *Property list*: `rationale`, `stockout_date`, `redesign_ready_date`, `notice_id`, `part_number`.
+3. **Forecast range**: *Metric cards*: `window_demand_p10` · `window_demand_p50` · `window_demand_p90`,
+   caption "Units needed over the redesign window (calibrated P10–P90, D-07)".
+4. *Object list* on `caseFlags` (`flag_type`, `flag`), titled "Engineering review flags".
+
+**Right: "Courses of action"**
+1. *Object table* on `caseCoas`: `name`, `buy_qty`, `total_usd` (currency, 0 dp),
+   `p_shortage` (percent, 0 dp), `p_shortage_under_stress` (percent, 0 dp). Active object → `selectedCoa`.
+2. *Property list* on `selectedCoa`: `summary`.
+3. *Button group*: **Approve course of action** → action `Approve course of action`,
+   defaults: Impact Case = `selectedCase`, course_of_action = `selectedCoa`.
+   Disabled when `selectedCase.status` ≠ `OPEN`.
+
+- **Check:** Heron is the first row and orange; its middle column reads 312 · 13.8 · 5.7 ·
+  24 · 10.2 and 337 / 573 / 880; the COA table shows 5,640 / $1.53M / 10% / 99%,
+  0 / $1.45M / 93% / 94%, 500 / $1.55M / 14% / 18%. Approving the hybrid flips the
+  status and disables the button.
+- **Screenshots for the deck/video:** the module with Heron selected; the action dialog;
+  the Procurement Request object after approval.
+
+## 5. Optional polish
+- Upload the two notice PDFs to a media set `notices/notice_pdfs` so Dana can open the
+  source next to the extracted rows (PDFs stay out of git).
+- Add `analysis/tradeoff_curve` as a Contour chart (x `buy_qty`, y `p_shortage` and
+  `expected_excess_usd`) and embed it under the COA table.

@@ -47,9 +47,20 @@ Return only the JSON object described in the schema.
 ```
 
 ## Long notices
-Intel PDN2401 lists 120 parts across six attachment tables. Extract per page (or per
-table) and union the results; long single calls are where rows get dropped. The
-evaluation below measures whether chunking is actually needed.
+Intel PDN2401 lists 120 parts across six attachment tables. Two modes are evaluated
+(D-19): `document` (one call per notice) and `page` (one call per page, each prefixed
+with page 1 so the dates are in view; results unioned). Long single calls are where
+rows get dropped; the evaluation measures whether chunking is actually needed.
+
+## Implementation
+- `src/continuum/extraction.py`: `SYSTEM_PROMPT` (the text above), `SCHEMA`, chunking,
+  tolerant JSON parsing, and a per-call log. Tested in `tests/test_extraction.py`.
+- Input: `raw/raw_notice_text`, the text layer of the two PDFs, one row per page
+  (CAAN-02OLLE763: 6 pages; PDN2401: 10 pages). All 230 ground-truth OPNs appear in it
+  verbatim.
+- Foundry transform: `foundry/continuum-transforms/pending/aip_extraction.py` writes
+  `aip/extraction_{small,frontier}_lines`, `..._calls`, and `aip/extraction_scores`.
+  It is held until the language-model libraries are added (`docs/MANUAL_STEPS.md`, step 2).
 
 ## Evaluation (D-14)
 Export the function's output as a dataset and score it with
@@ -59,3 +70,14 @@ part recall and precision, LTB/LTS accuracy, replacement accuracy, citation cove
 Model comparison: run the same notices through a small and a frontier model
 available in AIP. Keep the cheaper model for any step where its scores match.
 Report numbers on the AIP evaluation slide; do not round up.
+
+## Results
+**Not yet measured** (2026-09-26). Fill this table from `aip/extraction_scores`
+(`notice_id = POOLED`) after `docs/MANUAL_STEPS.md` step 2:
+
+| Model | Mode | Recall | Precision | LTB exact | LTS exact | Replacements | Citations | Failed calls |
+|---|---|---|---|---|---|---|---|---|
+| small | document | | | | | | | |
+| small | page | | | | | | | |
+| frontier | document | | | | | | | |
+| frontier | page | | | | | | | |
