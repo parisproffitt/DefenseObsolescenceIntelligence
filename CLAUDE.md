@@ -33,8 +33,30 @@ declares a replacement compatible and never computes numbers in prose.
 - Never commit manufacturer PDFs, tokens, or `.env`. No employer data anywhere.
 - Foundry access is via the `palantir` MCP server (see below). Prefer building in
   Foundry through it; mirror any Foundry-side code into `foundry/` in this repo.
-- The design deck is a Claude artifact (Slides); the main Claude conversation keeps it
-  updated. Note deck-relevant changes in the commit message so they can be reflected.
+- The design deck is a Claude Slides artifact: https://claude.ai/artifact/EL6ZbRX4M1vGhug25MaYwh
+  Keep it in sync: read it with the Artifact tool, edit only the affected slides
+  (`project/slides/<id>.html`), republish to that URL. Match its dark console style.
+
+## Definition of done (work through in order, without stopping to ask)
+1. **Phase 1, data** (`docs/FOUNDRY_BUILD.md`): Python transforms in the Continuum
+   project generate the raw datasets (port `generate.py` + `raw.py`) and clean them
+   into `clean/`; verify every row count and the 5-row `bom_notice_matches`.
+2. **Phase 2, Ontology:** all 10 object types and 11 link types from the build guide.
+3. **Phase 3, logic in Foundry:** port `impact.py`, `forecast.py`, `coa.py` as
+   transforms producing `impact_cases`, `review_flags`, `coas`, `tradeoff_curve`;
+   numbers must equal the invariants above.
+4. **AIP Logic:** `extractNoticeLines` per `docs/AIP_LOGIC.md`; score it with
+   `eval_extraction.score`; compare a small and a frontier model; record real numbers.
+5. **Action + app:** action type *Approve course of action* (sets Impact Case
+   `status`, creates Procurement Request and Engineering Review); Workshop app for
+   Dana: impact cases → Heron detail → forecast range → COAs → approve.
+6. **Docs:** DECISIONS.md entry for every choice, README + build guide current,
+   deck slides updated (plan, AIP evaluation numbers, screenshots described), and a
+   `docs/DEMO_SCRIPT.md` under 5 minutes that matches what was actually built.
+If a step is impossible with the tools available (e.g. the MCP cannot create action
+types or Workshop apps), do everything around it, write exact manual steps for Paris
+into `docs/MANUAL_STEPS.md`, and continue with the next step.
+Stop only for irreversible actions outside this project, or credentials.
 
 ## Palantir MCP
 Configured in Claude Code as server `palantir`:
