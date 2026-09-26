@@ -5,55 +5,49 @@ DECISIONS.md, so the platform, the code and the docs stay aligned.
 Foundry UI labels change over time: if a transform isn't where described, search
 the transform picker for the key word (e.g. "trim", "regex", "join").
 
-## Phase 1 — Raw data in, clean data out (Pipeline Builder)
+## Phase 1 — Raw data in, clean data out (Python transforms) — BUILT
 
-### 1.1 Folders in the `Continuum` project
-`raw/` · `notices/` · `clean/` · `ontology/` · `apps/`
+Built through the Palantir MCP (D-15, D-16). Code: Foundry repository
+`continuum-transforms` (`ri.stemma.main.repository.0a93c76c-9a57-4738-8165-833990fa1b0c`),
+mirrored in [`foundry/continuum-transforms/`](../foundry/continuum-transforms). The
+`myproject/continuum/` package in that repository is a verbatim copy of `src/continuum/`.
 
-### 1.2 Upload to `raw/` (New → Upload files → import as datasets)
-From `output/raw/`:
+### 1.1 Folders in the `Continuum` project (created by the transforms' output paths)
+`raw/` · `clean/` · `analysis/` · `aip/` · `ontology/`
 
-| File | What's messy about it |
-|---|---|
-| `raw_programs.csv` | Spreadsheet headers; `Planned EOS` as `MM/dd/yyyy` text |
-| `raw_bom_export.csv` | Part numbers padded, lower-case, one with a Digi-Key `-ND` suffix |
-| `raw_parts_master.csv` | `Unit Cost` as `$1,234.00` text |
-| `raw_inventory.csv` | Lower-case part numbers; `As Of` as `10-Jun-2025` |
-| `raw_demand_history.csv` | `Period` as `2025-05` text |
-
-From `output/` (computed by the reference implementation; moved into Foundry
-transforms in Phase 3): `notices.csv`, `notice_lines.csv`, `impact_cases.csv`,
-`review_flags.csv`, `coas.csv`, `tradeoff_curve.csv`, `backtest_summary.csv`.
-
-To `notices/`: the two notice PDFs (links in `data/notices/notices.csv`) and the
-manufacturers' official parts lists (see §1.5).
-
-### 1.3 Pipeline `continuum_clean` (New → Pipeline Builder → batch pipeline)
-Add the five `raw_*` datasets. Build these paths, each ending in an output in `clean/`:
-
-**Part-number cleaning — the same three steps on every `Part No.` column** (this is `partnumbers.normalize`):
-1. Trim whitespace
-2. Upper case
-3. Regex replace `(-ND|-CT|-TR|-DKR)$` → *(empty)*
-
-| Output | From | Steps |
+### 1.2 `raw/`: what the program office hands over
+| Dataset | Made by | What's in it |
 |---|---|---|
-| `programs` | `raw_programs` | Rename columns → `program_id, name, description, platform_type, fleet_size, end_of_support, redesign_lead_time_months, redesign_nre_usd`; parse `end_of_support` with format `MM/dd/yyyy`; cast lead time to integer, NRE to double |
-| `bom_lines` | `raw_bom_export` | Part-number cleaning into `part_number`; keep the original as `part_number_as_entered`; `bom_line_id = concat(Assy No., "-", lpad(Line, 2, "0"))`; rename `Assy No.→assembly_id`, `Program→program_id`, `Qty/Assy→qty_per_assembly` |
-| `assemblies` | `raw_bom_export` | Select `Assy No., Program, Assy Name` → drop duplicates → rename to `assembly_id, program_id, name` |
-| `parts` | `raw_parts_master` | Rename `Part No.→part_number`; regex replace `[$,]` → *(empty)* on `Unit Cost`, cast to double → `unit_cost_usd` |
-| `inventory` | `raw_inventory` | Part-number cleaning; parse `As Of` with `dd-MMM-yyyy`; `inventory_id = concat("INV-", Program, "-", part_number)`; `Qty OH→on_hand` (integer) |
-| `demand_monthly` | `raw_demand_history` | Part-number cleaning; `month = to_date(concat(Period, "-01"))`; `Units Issued→units` (integer) |
-| `bom_notice_matches` | `bom_lines` ⋈ `notice_lines` | **Inner join on `part_number`**. Expect **5 rows**, the same 5 impact cases the reference code finds. This is the exact-match rule (D-04) running in Foundry |
+| `raw_programs`, `raw_bom_export`, `raw_parts_master`, `raw_inventory`, `raw_demand_history` | `raw_exports.py` (ports `generate.py` + `raw.py`, seed 7) | One CSV file each, as a file drop: spreadsheet headers, padded / lower-case part numbers, a Digi-Key `-ND` suffix, `MM/dd/yyyy` and `dd-MMM-yyyy` text dates, `$1,234.00` text costs |
+| `raw_notices` | uploaded (`data/notices/notices.csv`) | Notice registry, all columns as text |
+| `raw_notice_parts` | uploaded (`data/reference/*_affected_parts.csv`) | The 230 real affected OPNs: ground truth (D-13) |
+| `raw_notice_text` | uploaded (text layer of the two notice PDFs, one row per page) | Input to the AIP extraction (step 4). The PDFs themselves are not in the repo |
 
-**Check:** row counts must equal the reference files: programs 3 · assemblies 7 ·
-parts 12 · bom_lines 13 · inventory 13 · demand_monthly 936 · bom_notice_matches 5.
-Petrel's `M1A3P400-1PQG208I-ND` must appear in the matches (the suffix was stripped).
+### 1.3 `clean/`: keyed, typed tables (`clean.py`)
+Every part number goes through `partnumbers.normalize()` (trim, upper-case, drop
+`-ND`/`-CT`/`-TR`/`-DKR`), the same function the matching uses. Every output declares
+its primary key as a FAIL check.
 
-Deploy the pipeline and build all outputs.
+| Output | From | Key |
+|---|---|---|
+| `programs` | `raw_programs` | `program_id` |
+| `assemblies` | `raw_bom_export` (distinct assemblies) | `assembly_id` |
+| `parts` | `raw_parts_master` | `part_number` |
+| `bom_lines` | `raw_bom_export` (`bom_line_id = Assy No. + "-" + 2-digit Line`) | `bom_line_id` |
+| `inventory` | `raw_inventory` (`inventory_id = INV-<program>-<part>`) | `inventory_id` |
+| `demand_monthly` | `raw_demand_history` | (dataset only) |
+| `notices` | `raw_notices` | `notice_id` |
+| `notice_lines` | `raw_notice_parts` (`notice_line_id = notice_id|part_number`) | `notice_line_id` |
+| `bom_notice_matches` | `bom_lines` ⋈ `notice_lines` on `part_number` (**inner join**: D-04 as a visible join) | `match_id` |
+
+**Verified in Foundry by SQL (2026-09-26):** programs 3 · assemblies 7 · parts 12 ·
+bom_lines 13 · inventory 13 · demand_monthly 936 (4,690 units) · notices 7 ·
+notice_lines 230 · **bom_notice_matches 5**. Petrel's `M1A3P400-1PQG208I-ND` is in the
+matches (suffix stripped); Heron's `"  a3p250-pqg208i "` too (padding and case);
+Petrel's `A3P1000-1FGG484I` is not.
 
 ### 1.4 Screenshot for the video/deck
-The pipeline graph (raw → clean) and the `bom_notice_matches` preview.
+The lineage graph (raw → clean → analysis) and the `bom_notice_matches` preview.
 
 ### 1.5 Verify the ground truth against the official source (D-13)
 - Microchip: download `CAAN-02OLLE763_Affected_CPN_06062025.csv` from the PCN portal

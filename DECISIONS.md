@@ -104,3 +104,9 @@ Newest decisions are appended at the bottom.
 - **Why:** The brief asks for a Foundry build, and every choice must be explainable. Knowing up front which steps the tools reach avoids pretending a step is automated when it is not.
 - **Alternative:** Build everything by hand in the Foundry UI, or skip what the MCP cannot reach.
 - **Why rejected:** Hand-building loses the repo mirror and reproducibility; skipping leaves the demo incomplete.
+
+### D-16 · Clean in Python transforms that call the matching code's own `normalize()` (revises D-12)
+- **Decision:** The raw → clean step runs as Python transforms in the `continuum-transforms` repository, not in Pipeline Builder. The raw exports are generated in Foundry by a transform (`generate.py` + `raw.py`, fixed seed) and written as CSV files, like a file drop. Each clean transform calls `partnumbers.normalize()` and declares its primary key as a FAIL check. The real notice lists are uploaded as-is (`raw_notices`, `raw_notice_parts`) because they are source data, not something to generate.
+- **Why:** Cleaning and matching now share one function, so a part number that cleans one way cannot match another way; the tests that pin `normalize()` also pin the Foundry cleaning. A duplicate key fails the build before it can reach the Ontology. And the MCP can create transforms but not Pipeline Builder pipelines, so this path is reproducible from the repo.
+- **Alternative:** Pipeline Builder with trim / upper-case / regex boards (D-12's plan), or uploading the clean CSVs.
+- **Why rejected:** Pipeline Builder would re-implement the normalizer in a second place that tests cannot reach. Uploading clean files hides the integration work. The lineage graph still shows raw → clean → analysis, which is what D-12 wanted.
