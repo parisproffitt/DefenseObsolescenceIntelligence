@@ -37,7 +37,10 @@ declares a replacement compatible and never computes numbers in prose.
   Keep it in sync: read it with the Artifact tool, edit only the affected slides
   (`project/slides/<id>.html`), republish to that URL. Style: near-black #08090A, off-white
   #EDEDEA, grays #B8BBBF/#8B8F94, ONE signal color #FF5B1F for critical items only;
-  Inter Tight + JetBrains Mono; doc-ID header and page number on every slide (17 slides).
+  Barlow Semi Condensed (headings, big numbers) + Barlow (body) + JetBrains Mono (labels);
+  faint crosshair-grid background, corner marks and a right-edge ruler on every slide;
+  doc-ID header and page number on every slide (17 slides). Titles say plainly what the
+  slide shows; no taglines.
 
 ## Definition of done (work through in order, without stopping to ask)
 1. **Phase 1, data** (`docs/FOUNDRY_BUILD.md`): Python transforms in the Continuum
