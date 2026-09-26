@@ -67,3 +67,10 @@ Newest decisions are appended at the bottom.
 - **Why:** My first version used a fitted trend. For Heron it returned +17%/yr, while the generator's true trend is +6%. In a 300-series simulation, both a log-linear fit and a Poisson regression were unbiased but off by about 11 points (RMSE) on 6 years of lumpy demand. That is too noisy to put in a procurement decision.
 - **Alternative:** Use the fitted trend, or hide growth risk entirely.
 - **Why rejected:** The first overstates risk from noise; the second hides the biggest weakness of a multi-decade buy. A stated scenario is transparent, and the engineer can change it.
+
+### D-11 · Ontology modeling: one object per real-world thing, stable string keys
+- **Decision:** Ten object types, each backed by one dataset with a unique string primary key; composite keys are joined with `|` (e.g. `notice_line_id = CAAN-02OLLE763|A3P1000-1PQG208I`). Monthly demand stays a dataset, not an object type.
+- **Why:** The engineer navigates *things* (a program, a part, an impact case); a key that reads as its meaning makes links auditable by eye. Demand is 800+ numeric rows only ever aggregated; as objects they would add clutter without a workflow that acts on a single month.
+- **Alternative:** Row-number IDs; an object per demand month.
+- **Why rejected:** Row numbers change when data is regenerated and break links; per-month objects serve no decision.
+- **Also:** Impact cases carry a `status` (starts `OPEN`) so the Ontology Action has a property to write when the engineer decides.

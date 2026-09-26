@@ -92,12 +92,28 @@ pytest
 
 ## Foundry and AIP mapping
 
+Upload `output/*.csv` as datasets, then create these object types ([D-11](DECISIONS.md)):
+
+| Object type | Backing dataset | Primary key | Title | Links |
+|---|---|---|---|---|
+| Program | `programs` | `program_id` | `name` | has many Assembly, Impact Case |
+| Assembly | `assemblies` | `assembly_id` | `name` | belongs to Program (`program_id`) |
+| Part | `parts` | `part_number` | `part_number` | — |
+| BOM Line | `bom_lines` | `bom_line_id` | `part_number` | Assembly (`assembly_id`), Part (`part_number`) |
+| Inventory Position | `inventory` | `inventory_id` | `inventory_id` | Program, Part |
+| Notice | `notices` | `notice_id` | `notice_id` | has many Notice Line |
+| Notice Line | `notice_lines` | `notice_line_id` | `part_number` | Notice (`notice_id`) |
+| Impact Case | `impact_cases` | `case_id` | `case_id` | Program, Part, Notice |
+| Review Flag | `review_flags` | `flag_id` | `flag_type` | Program, Part, Notice |
+| Course of Action | `coas` | `coa_key` | `name` | Impact Case (`case_id`) |
+
+`demand_monthly`, `tradeoff_curve` and the backtest outputs stay datasets (charts in Workshop / Contour).
+
 | Here | In Foundry |
 |---|---|
-| `output/*.csv` | Datasets, then Ontology object types: Program, Assembly, Part, BomLine, InventoryPosition, DemandMonth, Notice, NoticeLine, ImpactCase, ReviewFlag, CourseOfAction |
-| `partnumbers.py`, `impact.py`, `coa.py` | Python transforms / Functions |
-| Notice PDF to structured lines | AIP Logic, evaluated against `data/reference/*` |
+| `partnumbers.py`, `impact.py`, `coa.py` | Python transforms / Functions (Code Repositories) |
+| Notice PDF to structured lines | AIP Logic, evaluated against `notice_lines` |
 | COA narrative and decision memo | AIP Logic over computed COA values |
-| Engineer's choice | Ontology Action: create ProcurementRequest and EngineeringReview, set ImpactCase status |
+| Engineer's choice | Ontology Action: create Procurement Request and Engineering Review, set Impact Case `status` |
 
 *Programs Heron, Kite, and Petrel are fictional. No employer data is used.*

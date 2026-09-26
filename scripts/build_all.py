@@ -29,7 +29,11 @@ def main() -> None:
     OUT.mkdir(exist_ok=True)
     data = build()
     notice_parts = load_notice_parts()
-    for name, df in {**data, "notice_affected_parts": notice_parts}.items():
+    # Every Ontology object type needs a unique string primary key (D-11).
+    notice_lines = notice_parts.copy()
+    notice_lines.insert(0, "notice_line_id", notice_lines["notice_id"] + "|" + notice_lines["part_number"])
+    notices = pd.read_csv(ROOT / "data" / "notices" / "notices.csv")
+    for name, df in {**data, "notice_lines": notice_lines, "notices": notices}.items():
         df.to_csv(OUT / f"{name}.csv", index=False)
 
     cases, flags = [], []
@@ -39,6 +43,9 @@ def main() -> None:
         flags.append(f)
     impact = pd.concat(cases, ignore_index=True)
     review = pd.concat(flags, ignore_index=True)
+    review.insert(0, "flag_id", review["notice_id"] + "|" + review["program_id"] + "|"
+                  + review["part_number"] + "|" + review["flag_type"])
+    impact.insert(1, "status", "OPEN")
     impact.to_csv(OUT / "impact_cases.csv", index=False)
     review.to_csv(OUT / "review_flags.csv", index=False)
 
@@ -54,6 +61,7 @@ def main() -> None:
                       int(prog.redesign_lead_time_months), float(prog.redesign_nre_usd), life)
     cf = coas_frame(coas)
     cf.insert(0, "case_id", demo.case_id)
+    cf.insert(0, "coa_key", cf["case_id"] + "|" + cf["coa_id"])
     cf.to_csv(OUT / "coas.csv", index=False)
     tradeoff_curve(hist, int(demo.on_hand), float(part.unit_cost_usd),
                    int(prog.redesign_lead_time_months)).to_csv(OUT / "tradeoff_curve.csv", index=False)
