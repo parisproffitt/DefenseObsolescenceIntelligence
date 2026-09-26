@@ -1,2 +1,101 @@
-# DefensePartsObsolescenceIntelligence
-AI-assisted defense sustainment system built on Palantir Foundry and AIP that converts manufacturer end-of-life notices into program-level obsolescence impact analysis, uncertainty-aware demand forecasts, and human-approved mitigation decisions.
+# CONTINUUM — Obsolescence Intelligence for Defense Sustainment
+
+Built on Palantir Foundry and AIP, CONTINUUM turns manufacturer end-of-life notices into program-level impact analysis, uncertainty-aware demand forecasts, and human-approved mitigation decisions.
+
+> Defense systems serve for 25–30+ years. The commercial electronics inside them are supported for 4–7. When a part is discontinued, the manufacturer publishes a notice, usually a PDF. An engineer then has to work out what that one document means for every program that depends on it, before the last-time-buy window closes. The DoD calls this **DMSMS** (Diminishing Manufacturing Sources and Material Shortages).
+
+## The workflow
+
+```
+EOL notice (PDF) ──► AIP extraction ──► part-number normalization ──► BOM traversal
+      ──► coverage & gap math ──► demand forecast (calibrated range)
+      ──► replacement review flags ──► courses of action ──► engineer decides
+      ──► Ontology Action: procurement request + engineering review + risk status
+```
+
+| Step | Who does it | Why |
+|---|---|---|
+| Read the notice, extract OPNs, dates, replacements | **AIP** (with source citations) | Unstructured documents in many formats |
+| Match OPNs to BOM lines | **Deterministic code** | Identity question with one right answer ([D-04](DECISIONS.md)) |
+| Coverage, gap, severity | **Deterministic code** | Every number must be traceable |
+| How many units will we consume? | **ML: bootstrap forecast, calibrated** | Lumpy demand; the decision needs a range ([D-06, D-07](DECISIONS.md)) |
+| Replacement differences | **Code + AIP**, flagged for review | Compatibility is an engineering judgment ([D-05](DECISIONS.md)) |
+| Draft courses of action and memo | **AIP**, from computed numbers | Language and synthesis ([D-09](DECISIONS.md)) |
+| Choose a course of action | **The engineer** | Consequential decision |
+
+## Demo scenario (reproducible)
+
+Scenario date **2025-06-10**, replaying Microchip's real notice **CAAN-02OLLE763** (ProASIC3 FPGAs, last-time buy 2025-12-01).
+
+| Program | Part | On hand | Coverage | Severity |
+|---|---|---|---|---|
+| **Heron** (airlift fleet) | A3P1000-1PQG208I | 312 | 13.8 mo | **CRITICAL**: out of stock 10.2 months before a 24-month redesign could be ready; LTB closes in 5.7 months |
+| Heron | A3P250-PQG208I | 170 | 28.7 mo | WATCH |
+| Petrel (radar) | M1A3P400-1PQG208I | 133 | 43.1 mo | MODERATE |
+| Kite (trainer) | A3P250-PQG208I | 280 | > support life | LOW |
+
+**Review flags:**
+- Petrel's `A3P1000-1FGG484I` shares a device name with the notice but is a different package and **not** discontinued. It is flagged, not matched.
+- Kite's Intel `EP4CE10E22I7` replacement (PDN2401) changes the finish from tin-lead to lead-free, which triggers a tin-whisker review.
+
+**Heron courses of action** (notional costs):
+
+| COA | Buy | Total cost | Shortage risk | …if the +6%/yr trend continues |
+|---|---|---|---|---|
+| Life-of-type buy | 5,640 | $1.53M | 10% | ~100% |
+| Redesign only | 0 | $1.45M | 93% | 97% |
+| **Bridge buy + redesign** | **500** | **$1.55M** | **14%** | **29%** |
+
+## Forecast evaluation (held-out, 12-month cumulative demand)
+
+| Evaluation | Method | MAE vs naive average | P10–P90 coverage (target 80%) |
+|---|---|---|---|
+| 200-series corpus, raw bootstrap | bootstrap median | 1.05 | 69% |
+| 200-series corpus, calibrated (×1.35) | bootstrap median | 1.05 | **82%** |
+| Program series, calibrated | bootstrap median | 0.95 | 85% |
+
+The bootstrap's value is a **calibrated planning range**, not a sharper point estimate. Because the evaluation data is synthetic, these results validate the method's machinery and must be re-run on real demand history ([D-07](DECISIONS.md)).
+
+## Data
+
+| Data | Real or notional | Source |
+|---|---|---|
+| EOL notices, affected OPNs, dates, replacements | **Real** | Microchip CAAN-02OLLE763, Intel PDN2401 (see [`data/notices/`](data/notices)) |
+| Programs, assemblies, BOMs, inventory, costs | Notional | [`src/continuum/generate.py`](src/continuum/generate.py) |
+| Monthly demand history | Notional (lumpy, trended, seeded) | same |
+
+Only links and metadata for notices are committed, not the manufacturers' PDFs. The affected-part CSVs double as **ground truth** for evaluating AIP's extraction.
+
+## Repository
+
+```
+src/continuum/
+  partnumbers.py   normalization, ProASIC3/Intel OPN parsing, notice matching
+  generate.py      notional programs/BOMs/inventory/demand + evaluation corpus
+  forecast.py      baselines, bootstrap, calibration, rolling-origin backtest
+  impact.py        notice -> impact cases, coverage/gap/severity, review flags
+  coa.py           courses of action, holding cost, trend sensitivity
+scripts/build_all.py   generates everything into output/ (Foundry upload set)
+data/notices/          notice registry + sources
+data/reference/        real affected-part lists (ground truth)
+tests/                 21 pytest cases, incl. the demo story's numbers
+DECISIONS.md           design decision log
+```
+
+```bash
+pip install -e ".[dev]"
+python scripts/build_all.py     # writes output/*.csv and prints the scenario
+pytest
+```
+
+## Foundry and AIP mapping
+
+| Here | In Foundry |
+|---|---|
+| `output/*.csv` | Datasets, then Ontology object types: Program, Assembly, Part, BomLine, InventoryPosition, DemandMonth, Notice, NoticeLine, ImpactCase, ReviewFlag, CourseOfAction |
+| `partnumbers.py`, `impact.py`, `coa.py` | Python transforms / Functions |
+| Notice PDF to structured lines | AIP Logic, evaluated against `data/reference/*` |
+| COA narrative and decision memo | AIP Logic over computed COA values |
+| Engineer's choice | Ontology Action: create ProcurementRequest and EngineeringReview, set ImpactCase status |
+
+*Programs Heron, Kite, and Petrel are fictional. No employer data is used.*

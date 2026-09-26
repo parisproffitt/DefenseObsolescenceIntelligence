@@ -1,0 +1,8 @@
+notice_id,manufacturer,notice_type,issue_date,last_time_buy,last_time_ship,affected_part_count,replacements_listed,source_url,ground_truth_file,notes
+CAAN-02OLLE763,Microchip,EOL,2025-06-06,2025-12-01,2026-12-01,110,false,https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/7131/CAAN-02OLLE763.pdf,data/reference/CAAN-02OLLE763_affected_parts.csv,"ProASIC3 PQ208 devices. Microchip is qualifying an alternate assembly site and may cancel the EOL if it succeeds; LTB orders are NCNR."
+PDN2401,Intel,PDN,2024-01-15,2024-07-15,2025-01-15,120,true,https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/5787/PDN2401_Rev1.0.0.pdf,data/reference/PDN2401_affected_parts.csv,"Leaded (non-green plating) FPGA/CPLD packages discontinued; replacements are lead-free equivalents (N/G suffix). Finish change is a tin-whisker review item for defense programs."
+PDN2041,Intel,PDN,2020-12-04,2021-06-04,2021-12-06,,false,https://media.digikey.com/pdf/PCNs/Intel/PDN2041.pdf,,"Arria GX, Stratix II, MAX 7000A, MAX II families; no replacement devices available."
+ASER-31SUSF550,Microchip,EOL,2023-04-11,,2023-12-31,,true,https://www.mouser.com/PCN/Microchip_Technology_PCN_ASER_31SUSF550.pdf,,"ATmega128/256/640, ATxmega families."
+DSNO-22UTRQ751,Microchip,EOL,2026-02-26,,,,,https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/8898/DSNO-22UTRQ751.pdf,,
+PDN2312,Intel,PDN,2023-06-09,2024-03-22,2024-03-29,2,true,https://cdrdv2-public.intel.com/781327/pdn2312.pdf,,"Nios II IP ordering codes; replacement Nios V."
+202504001DN,NXP,DN,2025-04-16,,,,,https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/6778/PDN-202504001DN.pdf,,"Prose-heavy template."
