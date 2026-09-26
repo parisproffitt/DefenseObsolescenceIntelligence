@@ -162,7 +162,7 @@ Ontology changes are made on a branch and merged only after review, the same "ma
 
 ## Engineering quality
 
-- **27 automated tests** run on every push, including tests that pin every number in the demo.
+- **32 automated tests** run on every push, including tests that pin every number in the demo.
 - **Decision log:** [`DECISIONS.md`](DECISIONS.md) records each choice, the alternative considered and why it lost, including first attempts that failed a check and what replaced them.
 
 ## From demo to deployment
@@ -184,10 +184,11 @@ src/continuum/        reference implementation (Python)
   forecast.py         calibrated demand forecast and backtest
   coa.py              costed courses of action and stress test
   eval_extraction.py  scores AIP's notice extraction
+  extraction.py       AIP extraction prompt, chunking, parsing (shared with AIP Logic)
 foundry/              code deployed to Foundry (transforms, Ontology ids)
 data/                 notice registry and real parts lists (ground truth)
 docs/                 Foundry build guide, AIP Logic spec
-tests/                27 automated tests
+tests/                32 automated tests
 ```
 
 ```bash
