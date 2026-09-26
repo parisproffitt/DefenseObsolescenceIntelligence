@@ -38,7 +38,7 @@ declares a replacement compatible and never computes numbers in prose.
 
 ## Palantir MCP
 Configured in Claude Code as server `palantir`:
-`claude mcp add palantir -e FOUNDRY_TOKEN=$FOUNDRY_TOKEN -- npx -y palantir-mcp --foundry-api-url https://<your-host>.palantirfoundry.com`
+`claude mcp add palantir -e FOUNDRY_TOKEN=$FOUNDRY_TOKEN -- npx -y palantir-mcp --foundry-api-url https://continuum-demo.usw-17.palantirfoundry.com`
 It can modify the Ontology (object and link types, functions) and create / preview /
 debug Python transforms. It cannot write Ontology data or (per docs) upload datasets;
 generate notional data with a Python transform instead, and upload PDFs by hand.
