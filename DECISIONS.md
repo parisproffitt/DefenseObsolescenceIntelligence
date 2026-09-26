@@ -74,3 +74,15 @@ Newest decisions are appended at the bottom.
 - **Alternative:** Row-number IDs; an object per demand month.
 - **Why rejected:** Row numbers change when data is regenerated and break links; per-month objects serve no decision.
 - **Also:** Impact cases carry a `status` (starts `OPEN`) so the Ontology Action has a property to write when the engineer decides.
+
+### D-12 · Clean the data inside Foundry, from deliberately messy raw exports
+- **Decision:** Upload raw, spreadsheet-style exports (`output/raw/`: odd headers, padded and lower-case part numbers, a Digi-Key `-ND` suffix, text dates and `$` amounts) and clean them in a Pipeline Builder pipeline. The Python code stays as the reference implementation, and a test proves the cleaning rules reproduce it exactly.
+- **Why:** A real customer hands over exports like these, not tidy tables. Doing the cleaning in Foundry puts raw → clean in the lineage graph, where it can be inspected, and makes the exact-match rule (D-04) a visible join (`bom_notice_matches`, 5 rows).
+- **Alternative:** Upload the already-clean CSVs.
+- **Why rejected:** Foundry would only store files; the integration work would be invisible and untestable on the platform.
+
+### D-13 · Verify ground truth against the manufacturers' official parts lists
+- **Decision:** The 230 affected part numbers were read from the notice PDFs. Before any accuracy claim, they are cross-checked against Microchip's official affected-parts CSV and Intel's OPN list, committed under `data/reference/official/`.
+- **Why:** An extraction accuracy number is only as good as its answer key.
+- **Alternative:** Trust the transcription.
+- **Why rejected:** "How do you know your ground truth is right?" deserves a better answer than "I read it carefully."

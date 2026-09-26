@@ -55,3 +55,16 @@ def test_lead_free_replacement_is_flagged():
     data, parts = build(), load_notice_parts()
     _, flags = assess("PDN2401", parts, data, AS_OF)
     assert (flags.flag_type == "FINISH_CHANGE").any()
+
+
+def test_raw_bom_export_normalizes_back_to_reference():
+    """The Pipeline Builder cleaning (trim, upper-case, strip distributor suffix) must
+    reproduce the reference bom_lines table exactly."""
+    from continuum.partnumbers import normalize
+    from continuum.raw import to_raw
+
+    data = build()
+    raw = to_raw(data)["raw_bom_export"]
+    assert raw["Part No."].map(normalize).tolist() == data["bom_lines"]["part_number"].tolist()
+    assert raw["Part No."].str.endswith("-ND").any()          # distributor suffix present
+    assert (raw["Part No."] != raw["Part No."].str.strip()).any()  # padding present

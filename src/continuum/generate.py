@@ -114,7 +114,7 @@ BOM: dict[str, list[PartSpec]] = {
         PartSpec("NTL-1553-XCVR-2", "MIL-STD-1553 transceiver", 210.0, 1.5, 0.02, 0.3, coverage_months=60),
     ],
     "PET-RSP-500": [
-        PartSpec("M1A3P400-1PQG208I", "FPGA, ProASIC3 w/ Cortex-M1, PQFP-208, industrial",
+        PartSpec("M1A3P400-1PQG208I-ND", "FPGA, ProASIC3 w/ Cortex-M1, PQFP-208, industrial",
                  142.0, 3.5, 0.04, 0.4, coverage_months=38),
         # Same device as an affected family, DIFFERENT package (FBGA-484): NOT on the notice.
         PartSpec("A3P1000-1FGG484I", "FPGA, ProASIC3, 1M gates, FBGA-484, industrial",

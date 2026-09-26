@@ -20,6 +20,7 @@ from continuum.coa import build_coas, coas_frame, tradeoff_curve  # noqa: E402
 from continuum.forecast import DEFAULT_SPREAD, backtest, calibrate_spread  # noqa: E402
 from continuum.generate import AS_OF, build, evaluation_corpus, load_notice_parts  # noqa: E402
 from continuum.impact import assess, months_between  # noqa: E402
+from continuum.raw import to_raw  # noqa: E402
 
 DEMO_NOTICE = "CAAN-02OLLE763"
 OUT = ROOT / "output"
@@ -35,6 +36,10 @@ def main() -> None:
     notices = pd.read_csv(ROOT / "data" / "notices" / "notices.csv")
     for name, df in {**data, "notice_lines": notice_lines, "notices": notices}.items():
         df.to_csv(OUT / f"{name}.csv", index=False)
+    # Messy exports for Foundry ingestion; cleaned in Pipeline Builder (D-12).
+    (OUT / "raw").mkdir(exist_ok=True)
+    for name, df in to_raw(data).items():
+        df.to_csv(OUT / "raw" / f"{name}.csv", index=False)
 
     cases, flags = [], []
     for nid in notice_parts["notice_id"].unique():

@@ -68,6 +68,8 @@ The bootstrap's value is a **calibrated planning range**, not a sharper point es
 | Programs, assemblies, BOMs, inventory, costs | Notional | [`src/continuum/generate.py`](src/continuum/generate.py) |
 | Monthly demand history | Notional (lumpy, trended, seeded) | same |
 
+Raw, spreadsheet-style exports (`output/raw/`) are cleaned inside Foundry by a Pipeline Builder pipeline; the Python code is the reference implementation it must reproduce ([D-12](DECISIONS.md)). Step-by-step build: [`docs/FOUNDRY_BUILD.md`](docs/FOUNDRY_BUILD.md).
+
 Only links and metadata for notices are committed, not the manufacturers' PDFs. The affected-part CSVs double as **ground truth** for evaluating AIP's extraction.
 
 ## Repository
@@ -79,11 +81,13 @@ src/continuum/
   forecast.py      baselines, bootstrap, calibration, rolling-origin backtest
   impact.py        notice -> impact cases, coverage/gap/severity, review flags
   coa.py           courses of action, holding cost, growth stress test
+  raw.py           messy raw exports for Foundry ingestion
 scripts/build_all.py   generates everything into output/ (Foundry upload set)
 data/notices/          notice registry + sources
 data/reference/        real affected-part lists (ground truth)
-tests/                 21 pytest cases, incl. the demo story's numbers
+tests/                 22 pytest cases, incl. the demo story's numbers
 DECISIONS.md           design decision log
+docs/FOUNDRY_BUILD.md  exact Foundry / AIP build steps
 ```
 
 ```bash
