@@ -83,7 +83,12 @@ user message).
 - **Check:** 110 rows; every `last_time_buy` = 2025-12-01; `A3P1000-1PQG208I` present
   with a quote; the caveat about qualifying a new assembly site copied verbatim.
 
-## 3. Finish the *Approve course of action* action (step 5) — DONE 2026-09-27
+## 3. Finish the *Approve course of action* action (step 5)
+**Status 2026-09-27: rules configured** (checked with the MCP: modify Impact Case `status`;
+create Procurement Request with `buy_qty`→quantity, `procurement_usd`→cost, `summary`→
+justification; create Engineering Review with `rationale`→notes). No Procurement Request
+or Engineering Review objects exist and every case is still `OPEN`, so the test run did not
+persist (a dry run, or reverted). That is the right state for recording the approval live. — DONE 2026-09-27
 Built in Ontology Manager on main and verified with **Test run** (a dry run; nothing written):
 creates one Procurement Request (500 units, $92,500, status DRAFT, justification from the
 option's summary) and one Engineering Review (OPEN, notes from the case rationale), and sets
