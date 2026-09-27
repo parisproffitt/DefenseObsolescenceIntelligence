@@ -28,6 +28,8 @@ requirements:
     - transforms-verbs
     - foundry-transforms-lib-python
     - pyarrow
+    - palantir_models
+    - language-model-service-api
 
 build:
   script: python setup.py install --single-version-externally-managed --record=record.txt

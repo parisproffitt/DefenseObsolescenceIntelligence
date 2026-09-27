@@ -26,20 +26,21 @@ evaluation code is written and waiting in
 `foundry/continuum-transforms/pending/aip_extraction.py`; it needs the libraries and
 two model RIDs.
 
-**2a. Add the libraries (5 min). NOT YET IN THE REPO (checked 2026-09-27: no library commit on any branch; `meta.yaml` lists neither).**
-Open repository `continuum-transforms` → left sidebar **Libraries** → search
-`palantir_models` → **Add and install library**; repeat for `language-model-service-api`.
-The sidebar writes a commit (updating `conda_recipe/meta.yaml` and the lock file) to the
-branch that is open, so make sure it is **master** and that the commit appears in the
-repo's history. Wait for checks to pass. Then tell the terminal agent: it does 2b–2c and
-step 6c.
+**2a. Add the libraries — DONE 2026-09-27** (`palantir_models 0.2563.0`,
+`language-model-service-api 0.4123.0` on master).
 
-**2b. Pick the two models.** In the same repository, type
-`OpenAiGptChatLanguageModelInput("ri.` in any file and the picker lists the models
-enabled here. Choose one small (e.g. GPT-4.1 nano / GPT-5 nano) and one frontier
-(e.g. GPT-4.1 / GPT-5). If only Anthropic models are enabled, use
-`AnthropicClaudeLanguageModelInput` instead and adapt `_completer` (same two
-arguments, same return: the reply text).
+**2b. Import the two models into the project (3 min). NEEDED NOW.** The evaluation is on
+master (`transforms-python/src/myproject/datasets/aip_extraction.py`, GPT-4.1 nano vs
+GPT-4.1). Checks fail with `Jemma:AccessWithoutImportDenied`:
+`'ri.language-model-service..language-model.gpt-4-1-nano' is not referenced in the project`
+(same for `...gpt-4-1`). Fix: open that file in the repository, put the cursor in each
+model RID string (lines 23–24) and accept the **Import** prompt the editor offers (or
+retype `ri.` and pick the model from the dropdown, which imports it). Import both into
+project `Continuum`. Then **Rerun checks** on master's latest commit and confirm green.
+If GPT-4.1 / GPT-4.1 nano are not in the picker, pick the closest small / frontier pair
+it offers and tell the terminal agent which, so it updates `MODELS`.
+Then tell the terminal agent: it builds, reports the scores, picks the kept model, and
+installs the intake (6c).
 
 **2c. Drop in the evaluation.** Copy `pending/aip_extraction.py` to
 `transforms-python/src/myproject/datasets/aip_extraction.py`, set the two RIDs in
