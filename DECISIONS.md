@@ -7,7 +7,7 @@ Newest decisions are appended at the bottom.
 
 | Question | Decisions |
 |---|---|
-| Why this problem, and who has it? | D-01 |
+| Why this problem, and who has it? | D-01, D-24 |
 | How is the data sourced and structured? | D-02, D-03, D-11, D-12, D-13, D-16, D-20, D-22 |
 | Where is ML used, and how is it validated? | D-06, D-07, D-08, D-10 |
 | Where is AIP used, and how is it evaluated? | D-14, D-19, D-21 |
@@ -171,4 +171,11 @@ Newest decisions are appended at the bottom.
 - **Alternative:** Keep a person running each stage; or automate the approval too, with a rule such as "auto-buy when the gap is over N months".
 - **Why rejected:** A person running stages adds delay without adding judgment. Auto-approval commits money and engineering effort on a forecast; that is the one step where judgment is the point (D-05).
 - **Status (2026-09-27):** Gate written and tested (`tests/test_gate.py`). Foundry wiring is in progress: the terminal agent builds the inbox and gate transforms; the schedule and Automate rule are UI steps.
+
+### D-24 · SD-22 is the domain source of truth; research is cited and checked
+- **Decision:** The workflow follows the five steps of DoD SD-22 (Prepare, Identify, Assess, Analyze, Implement; guidebook updated January 2026), and the deck shows that mapping on its own slide. All domain and platform sources are listed in `docs/RESEARCH.md` with what each is used for, and every quoted claim was checked against the source. Forecasting papers (Sandborn et al. 2011; Mastrangelo et al. 2021) are cited as precedent for probabilistic DMSMS decisions, explicitly not as validation of this consumption forecast, which answers a different question. The deck ends with a references slide split into domain research and platform research.
+- **Why:** A reviewer asks whether the domain was understood. Mapping onto the government's own process shows the product fits the existing workflow instead of inventing one, and that Foundry was bent to the process, not the reverse. Stating what each source does *not* support keeps the citations honest.
+- **Alternative:** A long bibliography on the last slide only; or citing the forecasting papers as support for the model.
+- **Why rejected:** A bibliography added at the end does not show the sources shaped the design. Overstating the papers would be the first thing a domain expert catches.
+- **Note:** SD-22 has five steps, not four: *Prepare* (plan, team, access to data) comes first. The Analog Devices notice policy also lists "reason for discontinuance", which the extraction schema does not capture yet; recorded as a next step.
 

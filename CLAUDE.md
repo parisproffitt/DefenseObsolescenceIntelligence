@@ -12,7 +12,7 @@ BOMs → coverage / supply-gap math → calibrated demand forecast → courses o
 the engineer (Dana) approves → Ontology Action updates state.
 Programs Heron, Kite, Petrel are fictional. Scenario date 2025-06-10.
 
-Read first: `README.md`, `DECISIONS.md` (D-01…), `docs/FOUNDRY_BUILD.md`.
+Read first: `README.md`, `DECISIONS.md` (D-01…), `docs/FOUNDRY_BUILD.md`. Domain source of truth: DoD SD-22 (`docs/RESEARCH.md`).
 
 ## Invariants (tests pin them; the video narrates them)
 Heron `A3P1000-1PQG208I`: 312 on hand, 13.8 mo coverage, 5.7 mo to LTB, 24 mo redesign,
@@ -40,7 +40,7 @@ declares a replacement compatible and never computes numbers in prose.
   Barlow Semi Condensed (headings, big numbers) + Barlow (body) + JetBrains Mono (labels);
   faint crosshair-grid background, corner marks and a right-edge ruler on every slide;
   illustrations are white/gray engineering wireframes (isometric parts, planforms);
-  doc-ID header and page number on every slide (26 slides). Titles say plainly what the
+  doc-ID header and page number on every slide (28 slides). Titles say plainly what the
   slide shows; no taglines.
 
 ## Definition of done (work through in order, without stopping to ask)

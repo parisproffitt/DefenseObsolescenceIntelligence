@@ -245,6 +245,16 @@ Each change is documented with its evidence in [`DECISIONS.md`](DECISIONS.md).
 
 ---
 
+
+## References
+
+The workflow follows the DoD **SD-22 DMSMS Guidebook** (Defense Standardization Program Office, updated January 2026): *identify* (AIP reads the notice, code matches BOMs), *assess* (impact cases), *analyze* (demand range, costed options, memo) and *implement* (the engineer's approval, written back by an Action) ([D-24](DECISIONS.md)). Full citations, what each source is used for and what it does not support: [docs/RESEARCH.md](docs/RESEARCH.md).
+
+- DoD SD-22 DMSMS Guidebook; DoD Engineering of Defense Systems Guidebook (2022, Change 2 2024); SAE STD0016A (2023).
+- Sandborn, Prabhakar & Ahmad, *Microelectronics Reliability* 51(2), 2011; Mastrangelo, Olson & Summers, *Microelectronics Reliability* 127, 2021.
+- DSP Journal, Jul/Sep 2014; Microchip CAAN-02OLLE763; Intel PDN2401; Analog Devices product life cycle policy.
+- Palantir Foundry, Ontology, AIP, AIP Logic and Automate documentation.
+
 <details>
 <summary><b>Repository and reproduction</b></summary>
 
