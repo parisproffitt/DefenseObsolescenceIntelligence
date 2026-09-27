@@ -9,9 +9,9 @@ Project: `/CONTINUUM-edbe5f/Continuum`.
 
 ## 1. Approve the Ontology proposal (Phase 2 + the action)
 Everything Ontology-side was created on global branch **continuum-ontology**.
-1. Open Foundry → **Ontology Manager** → branch selector (top bar) → **continuum-ontology**,
-   or open the proposal link the MCP returned (recorded in `foundry/ONTOLOGY.md`).
-2. Review: 12 object types, 13 link types, 1 action type (*Approve course of action*).
+1. Open the proposal:
+   https://continuum-demo.usw-17.palantirfoundry.com/workspace/developer-branching/proposal/ri.branch..proposal.6aedeb42-43ab-456b-85fe-648ede7393b1
+2. Review: 12 object types, 15 link types, 1 action type (*Approve course of action*).
 3. **Approve** and **Merge**. Wait for the object indexes to finish (Ontology Manager →
    each object type → Datasources shows "Up to date").
 - **Check:** Object Explorer → search "Heron" → Program *Heron* → Assemblies (3) →

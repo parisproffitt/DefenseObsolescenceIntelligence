@@ -77,7 +77,11 @@ Link types (all one-to-many, foreign key on the first object): Assembly → Prog
 BOM Line → Assembly, BOM Line → Part, Inventory Position → Program, Inventory
 Position → Part, Notice Line → Notice, Impact Case → Program, Impact Case → Notice,
 Impact Case → Part, Review Flag → Notice, **Review Flag → Program, Review Flag → Part**
-(the last two added so the README's link list holds), Course of Action → Impact Case.
+(the last two added so the README's link list holds), Course of Action → Impact Case;
+and for the approve action (D-18): Procurement Request → Impact Case, Engineering Review →
+Impact Case, backed by the empty typed datasets `ontology/procurement_requests` and
+`ontology/engineering_reviews` (`writeback.py`). Action type *Approve course of action*
+created with its core rule; the rest is `docs/MANUAL_STEPS.md` step 3.
 
 **Manual:** approve the branch's proposal (`docs/MANUAL_STEPS.md`). **Check:** open
 Heron in Object Explorer and follow Program → Assembly → BOM Line → Part.

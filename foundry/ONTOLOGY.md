@@ -4,7 +4,8 @@ Created through the Palantir MCP on global branch `continuum-ontology`
 (`ri.branch..branch.f7823b55-60b9-4fb2-b5cf-13fe46b023a8`) of the CONTINUUM Ontology
 (`ri.ontology.main.ontology.f96d0a93-c559-4094-843c-ed770b5c83a0`). Foundry prefixes
 every id with the namespace `one4jwoo.`. The branch reaches the main Ontology when its
-proposal is approved (`docs/MANUAL_STEPS.md`, step 1).
+proposal is approved (`docs/MANUAL_STEPS.md`, step 1):
+https://continuum-demo.usw-17.palantirfoundry.com/workspace/developer-branching/proposal/ri.branch..proposal.6aedeb42-43ab-456b-85fe-648ede7393b1
 
 Property ids equal the dataset column names; API names are their camelCase form.
 
@@ -22,12 +23,12 @@ Property ids equal the dataset column names; API names are their camelCase form.
 | Impact Case (`one4jwoo.impact-case`) | `ImpactCase` | `analysis/impact_cases` | `case_id` | `title` |
 | Review Flag (`one4jwoo.review-flag`) | `ReviewFlag` | `analysis/review_flags` | `flag_id` | `flag_type` |
 | Course of Action (`one4jwoo.course-of-action`) | `CourseOfAction` | `analysis/coas` | `coa_key` | `name` |
-| Procurement Request | `ProcurementRequest` | `ontology/procurement_requests` | `request_id` | `request_id` |
-| Engineering Review | `EngineeringReview` | `ontology/engineering_reviews` | `review_id` | `review_id` |
+| Procurement Request (`one4jwoo.procurement-request`) | `ProcurementRequest` | `ontology/procurement_requests` | `request_id` | `request_id` |
+| Engineering Review (`one4jwoo.engineering-review`) | `EngineeringReview` | `ontology/engineering_reviews` | `review_id` | `review_id` |
 
 The last two are written only by the *Approve course of action* action (D-18).
 
-## Link types (all one-to-many; foreign key on the "many" side)
+## Link types (15, all one-to-many; foreign key on the "many" side)
 
 | Link (id) | One | Many | Key |
 |---|---|---|---|
@@ -44,3 +45,11 @@ The last two are written only by the *Approve course of action* action (D-18).
 | `one4jwoo.program-to-review-flag` | Program | Review Flag | `program_id` |
 | `one4jwoo.part-to-review-flag` | Part | Review Flag | `part_number` |
 | `one4jwoo.impact-case-to-course-of-action` | Impact Case | Course of Action | `case_id` |
+| `one4jwoo.impact-case-to-procurement-request` | Impact Case | Procurement Request | `case_id` |
+| `one4jwoo.impact-case-to-engineering-review` | Impact Case | Engineering Review | `case_id` |
+
+## Action type
+
+`approve-course-of-action` (`ri.actions.main.action-type.1d070cf4-1ac9-4bf0-b391-192fb695de6e`):
+parameters Impact Case + `status` (dropdown); rule: modify Impact Case `status`. The
+Course of Action parameter and the two create-object rules are added by hand (D-18).

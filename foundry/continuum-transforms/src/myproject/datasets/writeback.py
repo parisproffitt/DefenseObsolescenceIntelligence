@@ -15,12 +15,12 @@ PROCUREMENT = pa.schema([
     ("request_id", pa.string()), ("case_id", pa.string()), ("coa_key", pa.string()),
     ("program_id", pa.string()), ("part_number", pa.string()), ("quantity", pa.int64()),
     ("estimated_cost_usd", pa.float64()), ("status", pa.string()), ("requested_by", pa.string()),
-    ("requested_at", pa.timestamp("ms")), ("justification", pa.string()),
+    ("requested_at", pa.timestamp("us")), ("justification", pa.string()),
 ])
 REVIEW = pa.schema([
     ("review_id", pa.string()), ("case_id", pa.string()), ("coa_key", pa.string()),
     ("program_id", pa.string()), ("part_number", pa.string()), ("review_type", pa.string()),
-    ("status", pa.string()), ("opened_by", pa.string()), ("opened_at", pa.timestamp("ms")),
+    ("status", pa.string()), ("opened_by", pa.string()), ("opened_at", pa.timestamp("us")),
     ("notes", pa.string()),
 ])
 
