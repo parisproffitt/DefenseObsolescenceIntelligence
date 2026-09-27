@@ -60,7 +60,7 @@ rows get dropped; the evaluation measures whether chunking is actually needed.
   verbatim.
 - Foundry transform: `foundry/continuum-transforms/pending/aip_extraction.py` writes
   `aip/extraction_{small,frontier}_lines`, `..._calls`, and `aip/extraction_scores`.
-  It is held until the language-model libraries are added (`docs/MANUAL_STEPS.md`, step 2).
+  Superseded by D-26: the model calls run in a Pipeline Builder pipeline (`extract_notice_lines`) over `aip/extraction_prompts` (built in code); `pending/aip_parse.py` parses and scores the replies with the same tested functions (`docs/MANUAL_STEPS.md`, step 2b).
 
 ## Evaluation (D-14)
 Export the function's output as a dataset and score it with

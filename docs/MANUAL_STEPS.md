@@ -29,18 +29,36 @@ two model RIDs.
 **2a. Add the libraries — DONE 2026-09-27** (`palantir_models 0.2563.0`,
 `language-model-service-api 0.4123.0` on master).
 
-**2b. Import the two models into the project (3 min). NEEDED NOW.** The evaluation is on
-master (`transforms-python/src/myproject/datasets/aip_extraction.py`, GPT-4.1 nano vs
-GPT-4.1). Checks fail with `Jemma:AccessWithoutImportDenied`:
-`'ri.language-model-service..language-model.gpt-4-1-nano' is not referenced in the project`
-(same for `...gpt-4-1`). Fix: open that file in the repository, put the cursor in each
-model RID string (lines 23–24) and accept the **Import** prompt the editor offers (or
-retype `ri.` and pick the model from the dropdown, which imports it). Import both into
-project `Continuum`. Then **Rerun checks** on master's latest commit and confirm green.
-If GPT-4.1 / GPT-4.1 nano are not in the picker, pick the closest small / frontier pair
-it offers and tell the terminal agent which, so it updates `MODELS`.
-Then tell the terminal agent: it builds, reports the scores, picks the kept model, and
-installs the intake (6c).
+**2b. Run the two models in Pipeline Builder (10 min). NEEDED NOW (D-26).**
+The code-repository route is blocked: CI rejects any language-model ID that is not a
+project reference (a made-up ID gets the identical `Jemma:AccessWithoutImportDenied`), and
+the editor offers no model dropdown to import from. Pipeline Builder picks models from a
+list instead. The terminal agent has built `aip/extraction_prompts` (18 rows: one per
+model call; `document` mode = 2 calls, `page` mode = 16; column `prompt` holds the full
+user message).
+1. **If Use LLM later shows no models:** Control Panel → **AIP settings** → grant
+   *AIP capabilities for custom workflows* to your user/group, and on **Model
+   enablement** enable at least one model family (e.g. OpenAI). Needs an enrollment admin.
+2. Project `Continuum` → folder `aip` → **New → Pipeline** → *Batch pipeline*, name
+   `extract_notice_lines`.
+3. **Add data** → `aip/extraction_prompts`.
+4. Select that node → **Use LLM** → **Empty prompt**.
+   - **Model:** the smallest listed (e.g. GPT-4.1 nano / GPT-5 nano / Claude Haiku). Note its name.
+   - **Show configurations:** Temperature `0`; Max tokens the maximum offered (≥ 16000).
+   - **System prompt:** paste the block under *Prompt (system)* in `docs/AIP_LOGIC.md`
+     verbatim (starts "You extract facts from semiconductor end-of-life…").
+   - **Prompt / input data:** insert the column **`prompt`** and nothing else.
+   - **Output type:** String. Tick **Include errors**. Output column name: `llm_output`.
+   - **Trial run** one row (the `document|CAAN-02OLLE763|all` row): the output should be
+     a JSON object with a `lines` list. Then **Apply**.
+5. **Add output** on that node → new dataset `aip/extraction_small_raw` (keep all columns).
+6. From the `aip/extraction_prompts` node again: **Use LLM** with the **frontier** model
+   (e.g. GPT-4.1 / GPT-5 / Claude Sonnet), identical settings → output
+   `aip/extraction_frontier_raw`.
+7. **Save → Deploy**, and build both outputs.
+8. Tell the terminal agent the two model names. It installs `aip_parse.py` (parses with
+   the tested `parse_response`, records every unparsable reply) and builds
+   `aip/extraction_scores`.
 
 **2c. Drop in the evaluation.** Copy `pending/aip_extraction.py` to
 `transforms-python/src/myproject/datasets/aip_extraction.py`, set the two RIDs in
