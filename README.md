@@ -1,48 +1,136 @@
 # CONTINUUM
 
-**A decision-support system for defense parts obsolescence, built on Palantir Foundry and AIP.**
+**Decision support for defense parts obsolescence, built on Palantir Foundry and AIP.**
 
 [![tests](https://img.shields.io/github/actions/workflow/status/parisproffitt/DefenseObsolescenceIntelligence/tests.yml?branch=main&label=tests&style=flat-square&color=FF5B1F&labelColor=08090A)](https://github.com/parisproffitt/DefenseObsolescenceIntelligence/actions/workflows/tests.yml) &nbsp;Palantir Foundry · AIP · Python · MIT
 
-CONTINUUM reads a manufacturer's end-of-life notice, finds every program that depends on the discontinued parts, forecasts how many will be needed with an honest uncertainty range, and lays out costed options for an engineer to approve.
+CONTINUUM turns a manufacturer's end-of-life notice into a program decision. It reads the notice, identifies every program that depends on the discontinued parts, forecasts future demand with a calibrated uncertainty range, and presents costed courses of action for an engineer to approve. The approval is recorded in the Foundry Ontology.
 
-**In the demo,** one real Microchip notice reveals a program with a **10.2-month supply gap** that can't be fixed later. The recommended bridge buy cuts its shortage risk from **93% to 14%**.
-
-<!-- SCREENSHOT: Workshop app — impact case list with Heron flagged CRITICAL (docs/screenshots/workshop-cases.png) -->
+| | |
+|---|---|
+| **Problem** | Defense systems remain in service for 25–30 years; the commercial electronics inside them are supported for 4–7. Each discontinued part is a supply risk that arrives as a PDF. |
+| **User** | A DMSMS (obsolescence) engineer responsible for several programs. |
+| **Decision supported** | How many parts to buy before the last-time-buy window closes, and whether to start a redesign. |
+| **Approach** | Deterministic code for matching and arithmetic, a calibrated forecast for uncertainty, AIP for reading documents, and a human approval for the decision. |
+| **Demo result** | From one real Microchip notice: a program facing a 10.2-month supply gap, and a bridge-buy option that reduces shortage risk from 93% to 14%. |
+| **Status** | Data pipelines, Ontology, decision logic and the approval Action are built in Foundry. AIP model evaluation and the Workshop application are in progress. |
 
 ---
 
-## Why I built this
+## Demonstration
 
-I've been fascinated by military aircraft for as long as I can remember, and I've always wanted to ride in one. Working in the defense industry changed how I see them. I realized that keeping one aircraft flying takes far more pieces and parts than I'd ever imagined: thousands of components, each with its own supplier, stock and lifespan. Behind every one of those parts are people tracking notices, checking bills of materials and planning purchases years ahead, mostly by hand.
+**Video:** *to be added on completion (target: October 5, 2026).*
 
-That's the problem I chose: not the aircraft itself, but the unglamorous system that keeps it in the air. **A few-dollar part can ground a multimillion-dollar aircraft**, and it usually starts with a PDF nobody connected to the right program in time.
+| Screen | Shows |
+|---|---|
+| Impact cases *(screenshot to be added)* | Every program affected by a notice, ranked by severity |
+| Heron detail *(screenshot to be added)* | Stock coverage, the supply gap, and the forecast range |
+| Courses of action *(screenshot to be added)* | Three costed options and the approval Action |
+| AIP evaluation *(screenshot to be added)* | Extraction accuracy against the manufacturers' parts lists |
+| Data lineage *(screenshot to be added)* | Raw exports → clean tables → analysis in Foundry |
 
-## The problem
+<!-- Screenshots: docs/screenshots/{workshop-cases,workshop-heron,action-approve,aip-logic-eval,lineage}.png -->
 
-Defense systems serve for 25–30 years. The commercial electronics inside them are supported for only 4–7. When a manufacturer discontinues a part, it publishes a notice with a last-time-buy date. An engineer then has to work out which programs use the part, how long the remaining stock will last, and whether to buy more or fund a redesign, all before the window closes.
+---
 
-The DoD calls this **DMSMS** (Diminishing Manufacturing Sources and Material Shortages). The process is well defined. The bottleneck is information: notices, bills of materials, inventory and demand history all live in different places.
+## Contents
+1. [Motivation](#1-motivation)
+2. [Users and the current workflow](#2-users-and-the-current-workflow)
+3. [Domain background](#3-domain-background)
+4. [Approach](#4-approach)
+5. [Data and Ontology](#5-data-and-ontology)
+6. [Demand forecasting (ML)](#6-demand-forecasting-ml)
+7. [Notice extraction (AIP)](#7-notice-extraction-aip)
+8. [Where AI is not used](#8-where-ai-is-not-used)
+9. [Decision and action](#9-decision-and-action)
+10. [Robustness](#10-robustness)
+11. [Changes made during development](#11-changes-made-during-development)
+12. [Limitations and next steps](#12-limitations-and-next-steps)
 
-## How it works
+---
 
-| Step | What happens | Done by |
+## 1. Motivation
+
+I have been fascinated by military aircraft for as long as I can remember, and I have always wanted to ride in one. Working in the defense industry changed how I see them: keeping a single aircraft flying depends on thousands of parts, each with its own supplier, stock and lifespan, and on people who track notices, check bills of materials and plan purchases years in advance, largely by hand.
+
+This project addresses that supporting system rather than the aircraft itself. A few-dollar part can ground a multimillion-dollar aircraft, and the failure usually begins with a notice that was not connected to the right program in time.
+
+## 2. Users and the current workflow
+
+The user is a **DMSMS engineer** supporting several fielded programs. When a notice arrives, the engineer must answer one question before the buy window closes: *what does this mean for my programs, and what should we do?*
+
+Today that answer is assembled by hand from four separate sources: the notice, each program's bill of materials, inventory records, and demand history. One notice can list more than a hundred part numbers, and the demo notice leaves 5.7 months to place an order. The process is well defined by DoD guidance; the difficulty is connecting the information quickly and accurately.
+
+## 3. Domain background
+
+| Term | Meaning |
+|---|---|
+| **DMSMS** | Diminishing Manufacturing Sources and Material Shortages: the loss of a part's manufacturer or supply. |
+| **End-of-life notice** | A manufacturer's announcement that parts will be discontinued, with ordering deadlines. |
+| **LTB / LTS** | Last-time buy (final order date) and last-time ship (final delivery date). |
+| **NCNR** | Non-cancellable, non-returnable: last-time-buy orders usually cannot be undone. |
+| **Life-of-type buy** | Purchasing enough stock to support a system for the rest of its service life. |
+| **Form, fit, function** | Whether a replacement is interchangeable. It requires engineering judgment. |
+| **Tin whiskers** | A failure mode of pure-tin finishes, which is why a lead-free "replacement" still needs review. |
+
+The demo uses Microchip notice **CAAN-02OLLE763** (ProASIC3 FPGAs, June 2025). It lists 110 part numbers in the 208-pin package only, sets a last-time buy of December 1, 2025, and states that the notice may be cancelled if an alternate assembly site qualifies.
+
+## 4. Approach
+
+| Step | Performed by | Reason |
 |---|---|---|
-| 1. Read the notice | Extract affected parts, deadlines, replacements and caveats, each with a quote from the source | **AIP** |
-| 2. Match to programs | Find every bill of materials that uses an affected part; flag near-misses for review | Code |
-| 3. Measure impact | Stock coverage, supply gap and severity for each program | Code |
-| 4. Forecast demand | A calibrated range of how many parts each program will need | **ML** |
-| 5. Lay out options | Costed courses of action, explained in plain language | **AIP** |
-| 6. Decide | The engineer approves an option; an Ontology Action records it | **Engineer** |
+| Read the notice | **AIP** | Unstructured documents in varied formats |
+| Match parts to bills of materials | Code | An identity question with one correct answer |
+| Measure coverage, gap and severity | Code | Every number must be traceable to its inputs |
+| Forecast demand | **ML** | Demand is intermittent; the decision requires a range |
+| Present options | **AIP**, from computed values | Explanation and drafting |
+| Decide | **Engineer** | A consequential, partly irreversible decision |
 
-The rule behind every step: **code for identity and arithmetic, ML for uncertainty, AIP for language, and the engineer for judgment.** Every number the engineer sees is computed in code and traceable to its source.
+The governing principle: **code for identity and arithmetic, ML for uncertainty, AIP for language, and the engineer for judgment.**
 
-## AI and ML design
+## 5. Data and Ontology
 
-### AIP reads the notices
-Notices come in every format: prose, tables, multi-page attachments, revisions. AIP Logic turns each one into structured rows, and every row quotes the text it came from. It also copies word for word any sentence that could change a buy decision. In the demo notice, Microchip says it *may cancel* the end-of-life if a new factory qualifies, and the engineer needs to see that.
+**Sources.** The notices and their 230 affected part numbers, dates and replacements are real (Microchip CAAN-02OLLE763, Intel PDN2401). Program sustainment data is not public, so programs, bills of materials, inventory, costs and six years of monthly demand are notional and labeled as such. No employer data is used.
 
-The prompt's core rules ([full spec](docs/AIP_LOGIC.md)):
+**Ingestion.** Program data arrives as it would from a customer: spreadsheet exports with inconsistent headers, padded and lower-case part numbers, a distributor suffix, and dates stored as text. Python transforms in Foundry clean it using the same normalization function as the matching step, and each table enforces its primary key as a build check ([D-16](DECISIONS.md)).
+
+```python
+# foundry/continuum-transforms/src/myproject/datasets/clean.py
+@transform.using(
+    out=Output(f"{CLEAN}/bom_lines", checks=_pk("bom_line_id")),   # duplicate key fails the build
+    raw=Input(f"{RAW}/raw_bom_export"),
+)
+def bom_lines(out, raw):
+    ...  # part numbers pass through partnumbers.normalize(), shared with matching
+```
+
+**Ontology.** The model mirrors how the engineer reasons: a notice line identifies a part; the part appears on bill-of-materials lines within assemblies; assemblies belong to programs. An impact case joins one notice to one program's part, and holds its courses of action. Keys are stable, readable strings (for example `CAAN-02OLLE763|A3P1000-1PQG208I`), so links survive data regeneration and can be audited by eye. Monthly demand remains a dataset because no workflow acts on a single month ([D-11](DECISIONS.md)). Ontology changes are made on a branch and merged after review ([D-17](DECISIONS.md)).
+
+<!-- SCREENSHOT: Ontology graph around Heron (docs/screenshots/ontology.png) -->
+
+## 6. Demand forecasting (ML)
+
+**Why ML.** The buy decision depends on how many parts will be consumed over the redesign period. Spare-parts demand is intermittent (many zero months, then spikes), so a single-number forecast conceals the risk the decision is about. CONTINUUM forecasts cumulative demand as a distribution and sizes purchases at a stated confidence level.
+
+**Validation.** The initial model was overconfident: its 80% range contained only 69% of held-out outcomes. A spread factor was fitted on earlier months and evaluated on later months the model had not seen ([D-07](DECISIONS.md)):
+
+```python
+# src/continuum/forecast.py
+def calibrate_spread(demand, horizon=12, origins=range(36, 49, 3), target=0.80, grid=...):
+    """Smallest spread whose P10-P90 coverage reaches `target` on the calibration origins."""
+```
+
+| Held-out evaluation | Outcomes within the P10–P90 range (target 80%) |
+|---|---|
+| Uncalibrated, 200 series | 69% |
+| **Calibrated, 200 series** | **82%** |
+| Calibrated, demo programs | 85% |
+
+The median forecast is no more accurate than a simple average; the value of the model is a range that can be trusted. The demand data is synthetic, so these results validate the method rather than real-world accuracy.
+
+## 7. Notice extraction (AIP)
+
+**Why AIP.** Notices arrive as prose, tables and multi-page attachments in manufacturer-specific formats. Reading them is a language task. AIP extracts one row per affected part and must quote the source text for every row. It also copies verbatim any sentence that could change a purchasing decision, such as the demo notice's possible cancellation.
 
 ```text
 1. List EVERY affected ordering part number in the text, exactly as printed.
@@ -50,144 +138,104 @@ The prompt's core rules ([full spec](docs/AIP_LOGIC.md)):
 4. A replacement counts only if the notice explicitly pairs it with that part.
    Do not suggest one, and never state that a part is compatible.
 5. For every row, quote the shortest verbatim text that supports it.
-6. Copy any sentence that could change a buy decision into `caveats`, verbatim.
 ```
 
-**Measured, not trusted.** The output is scored against the manufacturers' real parts lists (230 part numbers). **Recall** catches the costly error, a missed part; **precision** catches the dangerous one, an invented part. A small and a frontier model are compared on the same notices, and the cheaper one is kept wherever it scores the same ([D-14](DECISIONS.md)).
+**Evaluation.** Output is scored against the manufacturers' parts lists (230 part numbers) for recall (missed parts), precision (invented parts), date accuracy and replacement accuracy. Two models are compared, and the less expensive model is retained where accuracy is equal ([D-14](DECISIONS.md), [D-19](DECISIONS.md)). *Results will be reported here once the model run completes.*
 
-<!-- SCREENSHOT: AIP Logic function and its evaluation results (docs/screenshots/aip-logic-eval.png) -->
+<!-- SCREENSHOT: AIP Logic function and evaluation results (docs/screenshots/aip-logic-eval.png) -->
 
-### ML forecasts demand as a range
-Spare-parts demand is lumpy: months of nothing, then a spike. A single-number forecast hides exactly the risk a buy decision is about, so CONTINUUM forecasts total demand over the decision window as a **distribution** and sizes purchases at a stated confidence level.
+## 8. Where AI is not used
 
-The first version was overconfident: its "80% range" held only 69% of real outcomes on held-out data. The fix widens the distribution by the smallest factor that reaches 80% on *earlier* data, then checks it on *later* data it never saw:
+Two decisions are deliberately kept away from AI:
 
-```python
-# src/continuum/forecast.py
-def calibrate_spread(demand, horizon=12, origins=range(36, 49, 3), target=0.80, grid=...):
-    """Smallest spread whose P10-P90 coverage reaches `target` on the calibration origins."""
-    for k in grid:
-        for _, y in _series(demand):
-            for o in origins:
-                s = bootstrap_samples(y[:o], horizon, seed=o, spread=k)
-                lo, hi = np.percentile(s, [10, 90])
-                hits.append(lo <= y[o:o + horizon].sum() <= hi)
-        ...
-```
-
-| Held-out test | Outcomes inside the P10–P90 range (target 80%) |
-|---|---|
-| Raw forecast, 200 series | 69% |
-| **Calibrated forecast, 200 series** | **82%** |
-| Calibrated forecast, demo programs | 85% |
-
-The honest finding: the forecast's middle value is no sharper than a simple average. **Its value is a range you can trust** ([D-07](DECISIONS.md)). The demand data is synthetic, so this validates the method, not real-world accuracy.
-
-### Options are costed under uncertainty
-Each option is priced from the forecast distribution: purchase, storage, engineering, chance of running out, and expected excess stock. A stress test asks what happens if an aging fleet uses parts faster. The growth rate is a stated assumption the engineer can change; a trend fitted to six years of lumpy data proved too noisy to trust (off by ±11 points in simulation, [D-10](DECISIONS.md)).
-
-### Where AI is deliberately not used
-Deciding whether a program's part is on a notice is an identity question with one right answer. The demo notice mentions "A3P1000 device families" but discontinues only the 208-pin package. A program using the same chip in a 484-ball package is **not** affected. Fuzzy or AI matching gets this wrong, so matching is exact, with near-misses flagged for a person ([D-04](DECISIONS.md)):
+- **Part matching.** Whether a program's part appears on a notice has one correct answer. The demo notice refers to "A3P1000 device families" but discontinues only the 208-pin package; a program using the same device in a 484-ball package is not affected. Fuzzy or model-based matching would report a false alarm. Matching is therefore exact, with near-misses flagged for review ([D-04](DECISIONS.md)).
+- **Compatibility and computation.** AIP never declares a replacement compatible, and never produces numbers. Coverage, gaps, costs and risks are computed in code; AIP explains them ([D-05](DECISIONS.md), [D-09](DECISIONS.md)).
 
 ```python
 # src/continuum/partnumbers.py
-for bp in bom_parts:
-    n = normalize(bp)                         # trim, upper-case, drop distributor suffixes
-    if n in exact:
-        results.append(MatchResult(bp, MatchType.EXACT, exact[n]))
-        continue
-    device = parse(bp).device                 # same chip, different package or grade?
-    if device and device in by_device:
-        results.append(MatchResult(bp, MatchType.FAMILY_ONLY, by_device[device]))
-    else:
-        results.append(MatchResult(bp, MatchType.NONE, None))
+n = normalize(bp)                         # trim, upper-case, drop distributor suffixes
+if n in exact:
+    results.append(MatchResult(bp, MatchType.EXACT, exact[n]))
+    continue
+device = parse(bp).device                 # same device, different package or grade?
+if device and device in by_device:
+    results.append(MatchResult(bp, MatchType.FAMILY_ONLY, by_device[device]))
+else:
+    results.append(MatchResult(bp, MatchType.NONE, None))
 ```
 
-## Demo: the Heron program
+## 9. Decision and action
 
-Replaying Microchip's real notice **CAAN-02OLLE763** (ProASIC3 FPGAs) as of June 2025, against three fictional programs:
+The demo replays the Microchip notice as of June 10, 2025, against three fictional programs.
 
-| | Heron · A3P1000-1PQG208I |
+| Heron · A3P1000-1PQG208I | |
 |---|---|
 | Units on hand | 312 |
 | Stock coverage | 13.8 months |
 | Last-time buy closes in | 5.7 months |
-| Redesign takes | 24 months |
-| **Result** | **CRITICAL: 10.2 months with no parts** |
+| Redesign lead time | 24 months |
+| **Assessment** | **Critical: 10.2 months without parts** |
 
-| Option | Buy | Total cost | Shortage risk | If demand grows 5%/yr |
+| Course of action | Units | Total cost | Shortage risk | With 5%/yr demand growth |
 |---|---|---|---|---|
 | Life-of-type buy | 5,640 | $1.53M | 10% | 99% |
 | Redesign only | 0 | $1.45M | 93% | 94% |
 | **Bridge buy + redesign** | **500** | **$1.55M** | **14%** | **18%** |
 
-The life-of-type buy bets 17 years on one forecast. The bridge buy costs about the same and only has to be right for 24 months. The engineer makes the call, and the Action records it. *(Heron and its costs are fictional.)*
+The life-of-type buy depends on a 17-year forecast; the bridge buy costs approximately the same and depends on a 24-month forecast. *(Costs are notional.)*
 
-<!-- SCREENSHOT: Heron impact case in Workshop — forecast range and the three options (docs/screenshots/workshop-heron.png) -->
-<!-- SCREENSHOT: Approve course of action — before/after status (docs/screenshots/action-approve.png) -->
+**The operator acts in one step.** The Action *Approve course of action* records the decision and, in the same transaction, creates a procurement request (quantity and cost copied from the selected option) and an engineering review. A case cannot be marked approved without the follow-up work that makes the decision real ([D-18](DECISIONS.md)).
 
-## Built on Foundry
+<!-- SCREENSHOT: Approve course of action, before and after (docs/screenshots/action-approve.png) -->
 
-| Layer | In Foundry |
+## 10. Robustness
+
+| Condition | System response |
 |---|---|
-| Data integration | Python transforms turn messy spreadsheet-style exports into clean, keyed tables |
-| Ontology | 10 object types, 13 link types: Program → Assembly → BOM Line → Part ← Notice Line |
-| Decision logic | Transforms compute impact cases, forecasts and courses of action |
-| AIP | AIP Logic extracts notice lines; explains options and drafts the decision memo |
-| Application | Workshop app for the engineer, with an Action that writes the decision back |
+| Demand grows as the fleet ages | Every option is re-priced under a stated growth rate the engineer can adjust ([D-10](DECISIONS.md)) |
+| The manufacturer may cancel the notice | The caveat is extracted verbatim and presented with the decision |
+| A new notice arrives | The same pipeline runs again and produces new impact cases |
+| A replacement changes its finish | Flagged for tin-whisker review; never approved automatically ([D-05](DECISIONS.md)) |
+| An export contains a bad row | Primary-key checks fail the build before data reaches the Ontology ([D-16](DECISIONS.md)) |
+| The model misreads a notice | Failed calls are recorded and scored, not dropped ([D-19](DECISIONS.md)) |
 
-Cleaning runs in Foundry with the **same normalizer the matching step uses**, and every table declares its primary key as a build check, so bad data fails the build instead of reaching the Ontology ([D-16](DECISIONS.md)):
+## 11. Changes made during development
 
-```python
-# foundry/continuum-transforms/src/myproject/datasets/clean.py
-@transform.using(
-    out=Output(f"{CLEAN}/bom_lines", checks=_pk("bom_line_id")),   # duplicate key → build fails
-    raw=Input(f"{RAW}/raw_bom_export"),
-)
-def bom_lines(out, raw):
-    df = _read_csv(raw, "raw_bom_export")
-    ...  # part numbers pass through partnumbers.normalize(), shared with matching
-```
+| Area | Initial approach | Finding | Change |
+|---|---|---|---|
+| Forecast range | Uncalibrated bootstrap | 69% coverage against an 80% target | Calibrated and tested on unseen months (82%) |
+| Evaluation size | 11 series | 80% in-sample, 67% held out | 200-series evaluation corpus |
+| Growth risk | Trend fitted to demand | Estimated +17%/yr against a true 6% | Stated, adjustable 5% scenario |
+| Life-of-type buy | Purchase cost only | Appeared cheapest and safest | Holding cost and stress test added |
+| Data cleaning | Pipeline Builder | Would duplicate the matching logic | Transforms share one `normalize()` |
+| Scope of AI | AI-assisted matching | False alarm on a different package | Exact matching with review flags |
 
-Ontology changes are made on a branch and merged only after review, the same "machine proposes, person approves" rule the product follows ([D-17](DECISIONS.md)).
+Each change is documented with its evidence in [`DECISIONS.md`](DECISIONS.md).
 
-<!-- SCREENSHOT: Foundry data lineage — raw exports → clean tables → analysis (docs/screenshots/lineage.png) -->
-<!-- SCREENSHOT: Ontology graph around Heron (docs/screenshots/ontology.png) -->
+## 12. Limitations and next steps
 
-## Data
+**Limitations.** Program data and demand are notional; forecast results validate the method, not real-world accuracy. AIP extraction accuracy is not yet measured. Costs are illustrative.
 
-- **Real:** the manufacturer notices and their 230 affected part numbers, deadlines and replacements (Microchip CAAN-02OLLE763, Intel PDN2401).
-- **Notional:** the programs (Heron, Kite, Petrel), their bills of materials, stock, costs and six years of demand. Real program data isn't public, so it's labeled as notional everywhere.
-- **Not included:** any employer data, and the notice PDFs themselves (linked, not redistributed).
+**Path to deployment.** A pilot with one program office would connect live notice feeds (manufacturer portals and GIDEP), replace notional data with the program's records and repeat every evaluation, and measure the time from notice to decision and the shortages identified before the buy window closed.
 
-## Engineering quality
-
-- **32 automated tests** run on every push, including tests that pin every number in the demo.
-- **Decision log:** [`DECISIONS.md`](DECISIONS.md) records each choice, the alternative considered and why it lost, including first attempts that failed a check and what replaced them.
-
-## From demo to deployment
-
-A pilot with one program office would:
-1. **Connect** live notice feeds (manufacturer portals and GIDEP, the government-industry exchange).
-2. **Replace** the notional data with the program's own records and re-run every evaluation.
-3. **Measure** hours from notice to decision, and shortages caught before the buy window closed.
+---
 
 <details>
-<summary><b>Repository layout and quickstart</b></summary>
+<summary><b>Repository and reproduction</b></summary>
 
 ```
 src/continuum/        reference implementation (Python)
   partnumbers.py      part-number normalization and notice matching
   generate.py         notional programs, bills of materials, stock, demand
-  raw.py              messy raw exports for Foundry ingestion
+  raw.py              raw exports for Foundry ingestion
   impact.py           coverage, supply gap, severity, review flags
   forecast.py         calibrated demand forecast and backtest
-  coa.py              costed courses of action and stress test
-  eval_extraction.py  scores AIP's notice extraction
-  extraction.py       AIP extraction prompt, chunking, parsing (shared with AIP Logic)
-foundry/              code deployed to Foundry (transforms, Ontology ids)
-data/                 notice registry and real parts lists (ground truth)
-docs/                 Foundry build guide, AIP Logic spec
+  coa.py              courses of action and stress test
+  extraction.py       AIP extraction prompt, chunking and parsing
+  eval_extraction.py  extraction scoring against ground truth
+foundry/              code deployed to Foundry (transforms, Ontology identifiers)
+data/                 notice registry and manufacturer parts lists (ground truth)
+docs/                 build guide, AIP specification, demo script, manual steps
 tests/                32 automated tests
 ```
 
@@ -198,4 +246,16 @@ pytest
 ```
 </details>
 
-<sub>Licensed under the [MIT License](LICENSE).</sub>
+<details>
+<summary><b>Documentation</b></summary>
+
+| Document | Contents |
+|---|---|
+| [`DECISIONS.md`](DECISIONS.md) | Every design decision, the alternative considered, and the reason |
+| [`docs/FOUNDRY_BUILD.md`](docs/FOUNDRY_BUILD.md) | How the system is built in Foundry |
+| [`docs/AIP_LOGIC.md`](docs/AIP_LOGIC.md) | Extraction prompt, output schema and evaluation |
+| [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) | The five-minute demonstration |
+| [`docs/MANUAL_STEPS.md`](docs/MANUAL_STEPS.md) | Steps completed in the Foundry interface |
+</details>
+
+<sub>Programs Heron, Kite and Petrel are fictional. Licensed under the [MIT License](LICENSE).</sub>

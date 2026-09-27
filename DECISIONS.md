@@ -3,6 +3,19 @@
 Format: **Decision** · **Why** (how it serves the operator) · **Alternative** · **Why rejected**.
 Newest decisions are appended at the bottom.
 
+## Reading guide
+
+| Question | Decisions |
+|---|---|
+| Why this problem, and who has it? | D-01 |
+| How is the data sourced and structured? | D-02, D-03, D-11, D-12, D-13, D-16 |
+| Where is ML used, and how is it validated? | D-06, D-07, D-08, D-10 |
+| Where is AIP used, and how is it evaluated? | D-14, D-19 |
+| What is AI deliberately not allowed to do? | D-04, D-05, D-09 |
+| How does the operator act on a decision? | D-17, D-18 |
+| What was changed after a first approach failed a check? | D-07 (calibration), D-08 (holding cost), D-10 (fitted trend), D-16 (revises D-12) |
+| What could only be done by hand, and why? | D-15, D-19 |
+
 ---
 
 ### D-01 · Problem: DMSMS obsolescence, not a flashier mission
