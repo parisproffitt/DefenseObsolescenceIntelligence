@@ -147,6 +147,22 @@ The second AIP Logic function: AIP writes the memo on the decision screen; code 
    the options above; the engineer decides."
 - **Screenshot:** the memo beside the Approve button (`docs/screenshots/workshop-memo.png`).
 
+## 6. Turn on autonomous intake (D-23, `docs/AUTOMATION.md`)
+**6a. Schedule (5 min).** Open `aip/notice_lines_auto` in Data Lineage → **Schedules** →
+**Create schedule**. Trigger: *When `raw/notice_inbox` is updated*. Target: *Build
+`analysis/coas` and all upstream datasets* (or select `aip/notice_intake_status`,
+`clean/notice_lines`, `analysis/impact_cases`, `analysis/coas`). Save and enable.
+- **Check:** release PDN2401 into the inbox (`raw/notice_inbox`, see the terminal agent's
+  note); the schedule starts a build within a minute without you clicking Build.
+
+**6b. Automate (10 min).** **New → Automate** `CONTINUUM – new impact case`.
+- Condition: *Objects added to object set* → Impact Case where `severity` is CRITICAL or
+  WATCH; add a second condition *Object modified* → `severity` changed to CRITICAL.
+- Effect: *Notification* to yourself (Dana), title `{severity}: {title}`, body
+  `{rationale}`, link to the Workshop module. Turn on email as well if offered.
+- **Check:** after 6a's test build, a notification for the Kite case arrives.
+- **Screenshot:** the notification (`docs/screenshots/automate-notification.png`).
+
 ## 5. Optional polish
 - Upload the two notice PDFs to a media set `notices/notice_pdfs` so Dana can open the
   source next to the extracted rows (PDFs stay out of git).

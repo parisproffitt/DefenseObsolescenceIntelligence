@@ -167,6 +167,8 @@ def unsupported_numbers(memo: str, input_block: str) -> list[str]:
 
 <!-- SCREENSHOT: AIP Logic function and evaluation results (docs/screenshots/aip-logic-eval.png) -->
 
+**Autonomous intake.** A new notice runs end to end with no one clicking anything: a build schedule fires on arrival, AIP extracts the rows, a code gate checks every row against the notice text (and holds the notice if any part number was missed), the analysis rebuilds, and Foundry Automate notifies the engineer. The approval stays human ([D-23](DECISIONS.md), [docs/AUTOMATION.md](docs/AUTOMATION.md)).
+
 ## 8. Where AI is not used
 
 Two decisions are deliberately kept away from AI:

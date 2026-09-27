@@ -113,3 +113,9 @@ AIP appears at three points (D-21):
 3. **`draftDecisionMemo`** (AIP Logic): Impact Case + Courses of Action → memo in Workshop beside *Approve*; numbers checked by `continuum.memo.unsupported_numbers`. MANUAL_STEPS 4a.
 
 The Action's create rules and the Workshop module are MANUAL_STEPS 3 and 4.
+
+## Phase 5 — Autonomous intake (D-23)
+See `docs/AUTOMATION.md`. Datasets: `raw/notice_inbox`, `aip/notice_lines_auto`,
+`aip/notice_lines_accepted`, `aip/notice_lines_rejected`, `aip/notice_intake_status`.
+Gate logic: `continuum/gate.py` (tested). Schedule and Automate rule: MANUAL_STEPS 6.
+

@@ -13,6 +13,7 @@ Newest decisions are appended at the bottom.
 | Where is AIP used, and how is it evaluated? | D-14, D-19, D-21 |
 | What is AI deliberately not allowed to do? | D-04, D-05, D-09, D-21 |
 | How does the operator act on a decision? | D-17, D-18 |
+| What runs without a person, and what never does? | D-05, D-23 |
 | What was changed after a first approach failed a check? | D-07 (calibration), D-08 (holding cost), D-10 (fitted trend), D-16 (revises D-12) |
 | What could only be done by hand, and why? | D-15, D-19 |
 
@@ -163,4 +164,11 @@ Newest decisions are appended at the bottom.
 - **Why:** A reviewer has to know which numbers describe the world and which describe the method. Extraction scores are real (real documents, verified key); forecast and option numbers are a method test on simulated demand. Saying so up front makes the results credible rather than weaker. Names get the same treatment: Heron, Kite, Petrel and Dana are invented and stated as such, and real part numbers appear only with their real notice status.
 - **Alternative:** Keep sourcing notes scattered across `data/notices/SOURCES.md`, slide footers and decision entries.
 - **Why rejected:** Scattered notes can't be checked in one pass, and one missed "notional" label is enough to make a reviewer doubt every number.
+
+### D-23 · Autonomous intake up to the decision, behind a code gate
+- **Decision:** A new notice flows end to end without anyone running anything: a build schedule fires when `raw/notice_inbox` updates, the kept model extracts rows, `continuum/gate.py` checks every row against the notice text, released notices go through matching, impact, forecast and options, the Ontology updates, and Foundry Automate notifies Dana when a case is added or turns CRITICAL. The approval stays with Dana. A notice with any rejected row, or any part number in its text that the extraction missed, is held for review instead of acted on. Design and click paths: `docs/AUTOMATION.md`, `docs/MANUAL_STEPS.md` step 6.
+- **Why:** The value of the system is time: the buy window for the demo part is 5.7 months, and the manual workflow spends weeks of it re-finding information. Automating everything up to the decision removes that delay. The gate is what makes it safe: with no answer key for a new notice, the only honest checks are ones against the notice itself, and the most dangerous failure (a dropped part) is caught by the same reverse check that verified the answer key (D-20).
+- **Alternative:** Keep a person running each stage; or automate the approval too, with a rule such as "auto-buy when the gap is over N months".
+- **Why rejected:** A person running stages adds delay without adding judgment. Auto-approval commits money and engineering effort on a forecast; that is the one step where judgment is the point (D-05).
+- **Status (2026-09-27):** Gate written and tested (`tests/test_gate.py`). Foundry wiring is in progress: the terminal agent builds the inbox and gate transforms; the schedule and Automate rule are UI steps.
 
