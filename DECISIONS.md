@@ -138,6 +138,8 @@ Newest decisions are appended at the bottom.
 - **Alternative:** A status field only, or a free-text approval note; or a TypeScript function-backed action.
 - **Why rejected:** A status alone leaves the follow-up work in email. A function-backed action is the stronger long-term design (it could also validate that the COA belongs to the case) but cannot be created or published through the tools available; it is noted as the next step.
 
+- **Verified (2026-09-27):** Test run in Ontology Manager creates the Procurement Request (500 units, $92,500) and the Engineering Review and sets Heron's status to the approved option, in one submission.
+
 ### D-19 · One extraction harness for evaluation and for AIP Logic; the model run waits on a UI step
 - **Decision:** The prompt, page chunking and JSON parsing live in `continuum/extraction.py` (unit-tested with a stub model). A Foundry transform binds two AIP models to it and scores every run with `eval_extraction.score`, in two modes: the whole notice in one call, and one call per page with page 1 (where the dates are) as context. The input is the PDFs' text layer, uploaded as `raw/raw_notice_text`; it contains all 230 ground-truth part numbers verbatim, so the score measures the model, not OCR. The AIP Logic function `extractNoticeLines` uses the same prompt text, so the evaluation numbers describe it.
 - **Why:** The same code path for testing and production means the number on the slide describes the thing in the app. Scoring both modes answers AIP_LOGIC.md's open question (is chunking needed for the 120-part Intel notice?) with data instead of a guess. A failed or unparsable call is recorded as a row, never silently dropped, because a silent drop would look like a recall problem.

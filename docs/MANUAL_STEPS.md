@@ -83,7 +83,14 @@ user message).
 - **Check:** 110 rows; every `last_time_buy` = 2025-12-01; `A3P1000-1PQG208I` present
   with a quote; the caveat about qualifying a new assembly site copied verbatim.
 
-## 3. Finish the *Approve course of action* action (step 5)
+## 3. Finish the *Approve course of action* action (step 5) — DONE 2026-09-27
+Built in Ontology Manager on main and verified with **Test run** (a dry run; nothing written):
+creates one Procurement Request (500 units, $92,500, status DRAFT, justification from the
+option's summary) and one Engineering Review (OPEN, notes from the case rationale), and sets
+Heron's status to `APPROVED: Bridge buy + redesign (hybrid)`. As built, `status` is a dropdown
+of the four allowed values (Steve picks the approved option), and `course_of_action` has no
+case filter (Workshop passes the selected option). The steps below are kept for reference.
+
 The MCP created the action (`approve-course-of-action`,
 `ri.actions.main.action-type.1d070cf4-1ac9-4bf0-b391-192fb695de6e`) with its core rule:
 *modify Impact Case → `status`* (dropdown: `APPROVED: …` / `OPEN`). Add the rest in
