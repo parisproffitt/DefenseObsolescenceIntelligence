@@ -1,4 +1,4 @@
-# AIP Logic — notice extraction
+# AIP Logic — notice extraction and decision memo
 
 The one step where an LLM does the work (D-09): read a manufacturer notice and
 return structured, cited rows. Everything downstream (matching, math, courses of
@@ -81,3 +81,44 @@ Report numbers on the AIP evaluation slide; do not round up.
 | small | page | | | | | | | |
 | frontier | document | | | | | | | |
 | frontier | page | | | | | | | |
+
+---
+
+# AIP Logic — `draftDecisionMemo` (D-21)
+
+The second AIP Logic function. It turns the computed options for one Impact Case into
+the memo Dana would otherwise write by hand. It never computes, recommends or judges fit.
+
+**Input:** one Impact Case object. The function reads its properties and its linked
+Course of Action objects (Search Around → Courses of Action), and the notice's
+`caveats` if extracted.
+**Output:** String (plain-text memo, three sections: Situation · Options · Decision needed).
+**Model:** the model kept in the extraction comparison; temperature 0.
+
+**Prompt (system):** `continuum.memo.SYSTEM_PROMPT`, verbatim:
+```
+You draft a short decision memo for a defense program office about one obsolete part.
+Rules:
+1. Use only the facts in the INPUT block. Copy every number exactly as written there.
+   Never compute, round, convert or estimate a new number.
+2. Do not recommend or choose a course of action. Present each option's quantity, cost
+   and chance of running short (flat demand and under the stated stress), then state
+   the decision the engineer must make and the date it must be made by.
+3. If a caveat is given, quote it verbatim.
+4. Never state that a replacement part is compatible.
+5. Three headed sections: Situation, Options, Decision needed. Under 220 words.
+Return the memo as plain text.
+```
+**Task prompt:** the INPUT block exactly as `continuum.memo.build_input(case, coas, caveats)`
+renders it (one `key: value` line per property; one `option:` line per Course of Action).
+
+**Guardrail:** `continuum.memo.unsupported_numbers(memo, input_block)` must return an
+empty list before the memo is shown. In Foundry this is a TypeScript/Python function
+check in the Logic board (a final block that compares the numbers) or, simplest, a
+Workshop rule that shows the memo only when the check function returns `[]`.
+
+**Expected memo for Heron** (numbers must match exactly): 312 units, 13.8 months of
+stock, 5.7 months to the 2025-12-01 last-time buy, 24-month redesign, 10.2-month gap;
+life-of-type buy 5,640 units, $1.53M, 10% / 99%; redesign only 0 units, $1.45M,
+93% / 94%; bridge buy + redesign 500 units, $1.55M, 14% / 18%.
+

@@ -10,8 +10,8 @@ Newest decisions are appended at the bottom.
 | Why this problem, and who has it? | D-01 |
 | How is the data sourced and structured? | D-02, D-03, D-11, D-12, D-13, D-16 |
 | Where is ML used, and how is it validated? | D-06, D-07, D-08, D-10 |
-| Where is AIP used, and how is it evaluated? | D-14, D-19 |
-| What is AI deliberately not allowed to do? | D-04, D-05, D-09 |
+| Where is AIP used, and how is it evaluated? | D-14, D-19, D-21 |
+| What is AI deliberately not allowed to do? | D-04, D-05, D-09, D-21 |
 | How does the operator act on a decision? | D-17, D-18 |
 | What was changed after a first approach failed a check? | D-07 (calibration), D-08 (holding cost), D-10 (fitted trend), D-16 (revises D-12) |
 | What could only be done by hand, and why? | D-15, D-19 |
@@ -150,3 +150,11 @@ Newest decisions are appended at the bottom.
 - **Alternative:** Wait for the official files; or trust the transcription.
 - **Why rejected:** Waiting would leave the evaluation unverified. The official files are still worth adding (`docs/MANUAL_STEPS.md` step 5), but the notice itself is the primary source, and the key now matches it exactly.
 - **Worth knowing for the AIP evaluation:** CAAN-02OLLE763 also says the parts "will no longer be offered after December 1, 2026", which is the ship date, not the buy date. It is a realistic trap, and `ltb_accuracy` will show whether a model falls into it.
+
+### D-21 · AIP is used at three points in the workflow, and the memo is checked against its input
+- **Decision:** AIP does three jobs, each with a checkable rule. (1) AIP Logic `extractNoticeLines` turns notice text into Notice Line rows with a verbatim quote per row (D-14, D-19). (2) A small and a frontier model are compared on the same notices, and the cheaper one is kept where scores hold. (3) AIP Logic `draftDecisionMemo` takes an Impact Case and its Courses of Action from the Ontology and writes the memo Dana reads in Workshop next to *Approve*. The memo's only facts are the objects' property values, rendered by `continuum/memo.py::build_input`; `unsupported_numbers` rejects any memo containing a number that is not in that input, and the prompt forbids recommending an option or calling a replacement compatible. The deck gives this its own two slides (platform integration, AIP in the workflow) and the demo video shows the memo before the approval.
+- **Why:** The brief assesses how AIP is integrated into the workflow, not whether it is present. A memo is the step where an LLM saves an engineer the most time, and also where a fluent wrong number would do the most harm; checking every number against the Ontology keeps the benefit and removes that failure mode. Putting the memo on the decision screen makes AIP part of the decision rather than a side demo.
+- **Alternative:** Use AIP only for extraction; or let an AIP agent answer free-form questions over the Ontology; or have the memo recommend an option.
+- **Why rejected:** Extraction alone shows AIP reading, not AIP helping the decision. A free-form agent is harder to evaluate in a five-minute demo and invites the model to compute numbers in prose (D-09). A recommending memo would move judgment from the engineer to the model (D-05).
+- **Status (2026-09-27):** Prompt, input builder and number check are written and tested (`tests/test_memo.py`). The AIP Logic function and its Workshop panel are UI steps (`docs/MANUAL_STEPS.md` step 4a); the MCP cannot create AIP Logic functions (D-15).
+

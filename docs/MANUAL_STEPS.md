@@ -129,6 +129,24 @@ so this is layout only: no logic lives in the app (D-09). About 30 minutes.
 - **Screenshots for the deck/video:** the module with Heron selected; the action dialog;
   the Procurement Request object after approval.
 
+## 4a. Build `draftDecisionMemo` and show it in the app (D-21)
+The second AIP Logic function: AIP writes the memo on the decision screen; code checks its numbers.
+1. Project `Continuum` → **New → AIP Logic** → `draftDecisionMemo`, saved in `.../Continuum/aip`.
+2. **Input:** `impactCase` (Object: *Impact Case*). **Output:** String.
+3. Blocks: *Get object properties* on `impactCase`; *Search Around* → Courses of Action
+   (name, buy_qty, total_usd, p_shortage, p_shortage_under_stress); then **Use LLM** with
+   the kept model, temperature 0. System prompt: `docs/AIP_LOGIC.md` → *draftDecisionMemo*
+   verbatim. Task prompt: the INPUT block in the same `key: value` layout as
+   `continuum.memo.build_input` (money as `$1.55M`, risks as `14%`).
+4. **Test** with the Heron impact case. **Check:** every number in the memo is one of those
+   listed under *Expected memo for Heron*; no option is recommended; paste the memo into
+   `unsupported_numbers` (or eyeball it against the list) and record the result.
+5. **Workshop:** in the right column under the COA table, add a *Markdown* (or Text)
+   widget titled "Decision memo (drafted by AIP)" whose content is a function-backed
+   variable calling `draftDecisionMemo(selectedCase)`. Add a caption: "Numbers come from
+   the options above; the engineer decides."
+- **Screenshot:** the memo beside the Approve button (`docs/screenshots/workshop-memo.png`).
+
 ## 5. Optional polish
 - Upload the two notice PDFs to a media set `notices/notice_pdfs` so Dana can open the
   source next to the extracted rows (PDFs stay out of git).

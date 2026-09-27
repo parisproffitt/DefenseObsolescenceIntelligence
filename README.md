@@ -26,10 +26,11 @@ CONTINUUM turns a manufacturer's end-of-life notice into a program decision. It 
 | Impact cases *(screenshot to be added)* | Every program affected by a notice, ranked by severity |
 | Heron detail *(screenshot to be added)* | Stock coverage, the supply gap, and the forecast range |
 | Courses of action *(screenshot to be added)* | Three costed options and the approval Action |
+| Decision memo *(screenshot to be added)* | The memo AIP drafts from the Ontology, beside *Approve* |
 | AIP evaluation *(screenshot to be added)* | Extraction accuracy against the manufacturers' parts lists |
 | Data lineage *(screenshot to be added)* | Raw exports → clean tables → analysis in Foundry |
 
-<!-- Screenshots: docs/screenshots/{workshop-cases,workshop-heron,action-approve,aip-logic-eval,lineage}.png -->
+<!-- Screenshots: docs/screenshots/{workshop-cases,workshop-heron,workshop-memo,action-approve,aip-logic-eval,lineage}.png -->
 
 ---
 
@@ -138,6 +139,20 @@ The median forecast is no more accurate than a simple average; the value of the 
 4. A replacement counts only if the notice explicitly pairs it with that part.
    Do not suggest one, and never state that a part is compatible.
 5. For every row, quote the shortest verbatim text that supports it.
+```
+
+**Where AIP sits in the workflow.** AIP is used at three points, each with a rule that can be checked ([D-21](DECISIONS.md)):
+
+| Step | AIP capability | Output | Rule |
+|---|---|---|---|
+| Read the notice | AIP Logic `extractNoticeLines` | Notice Line objects, one per part, each with a verbatim quote | Never normalizes or invents a part number |
+| Choose the model | Language models in a Foundry transform | Field-by-field scores for a small and a frontier model | Keep the cheaper model where scores hold |
+| Explain the options | AIP Logic `draftDecisionMemo`, reading Impact Case and Course of Action objects | The memo shown in Workshop beside *Approve* | Every number must appear in the Ontology input (`memo.unsupported_numbers`); no recommendation |
+
+```python
+def unsupported_numbers(memo: str, input_block: str) -> list[str]:
+    """Numbers in the memo that do not appear in the input. Empty list = memo may be shown."""
+    return sorted(_numbers(memo) - _numbers(input_block))
 ```
 
 **Evaluation.** Output is scored against the manufacturers' parts lists (230 part numbers) for recall (missed parts), precision (invented parts), date accuracy and replacement accuracy. Two models are compared, and the less expensive model is retained where accuracy is equal ([D-14](DECISIONS.md), [D-19](DECISIONS.md)). *Results will be reported here once the model run completes.*

@@ -106,3 +106,10 @@ Heron's forecast range over the 24-month window is P10 337, P50 573, P90 880 uni
 
 ## Phase 4 — AIP, Action, app
 See `docs/AIP_LOGIC.md` (extraction and its evaluation) and `docs/MANUAL_STEPS.md`.
+
+AIP appears at three points (D-21):
+1. **`extractNoticeLines`** (AIP Logic): notice text → Notice Line rows with verbatim quotes. MANUAL_STEPS 2d.
+2. **Model comparison** (language models in the `aip_extraction.py` transform): small vs frontier, scored against the 230-part key. MANUAL_STEPS 2a–2c.
+3. **`draftDecisionMemo`** (AIP Logic): Impact Case + Courses of Action → memo in Workshop beside *Approve*; numbers checked by `continuum.memo.unsupported_numbers`. MANUAL_STEPS 4a.
+
+The Action's create rules and the Workshop module are MANUAL_STEPS 3 and 4.
