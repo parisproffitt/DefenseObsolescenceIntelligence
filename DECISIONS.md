@@ -8,7 +8,7 @@ Newest decisions are appended at the bottom.
 | Question | Decisions |
 |---|---|
 | Why this problem, and who has it? | D-01 |
-| How is the data sourced and structured? | D-02, D-03, D-11, D-12, D-13, D-16 |
+| How is the data sourced and structured? | D-02, D-03, D-11, D-12, D-13, D-16, D-20, D-22 |
 | Where is ML used, and how is it validated? | D-06, D-07, D-08, D-10 |
 | Where is AIP used, and how is it evaluated? | D-14, D-19, D-21 |
 | What is AI deliberately not allowed to do? | D-04, D-05, D-09, D-21 |
@@ -157,4 +157,10 @@ Newest decisions are appended at the bottom.
 - **Alternative:** Use AIP only for extraction; or let an AIP agent answer free-form questions over the Ontology; or have the memo recommend an option.
 - **Why rejected:** Extraction alone shows AIP reading, not AIP helping the decision. A free-form agent is harder to evaluate in a five-minute demo and invites the model to compute numbers in prose (D-09). A recommending memo would move judgment from the engineer to the model (D-05).
 - **Status (2026-09-27):** Prompt, input builder and number check are written and tested (`tests/test_memo.py`). The AIP Logic function and its Workshop panel are UI steps (`docs/MANUAL_STEPS.md` step 4a); the MCP cannot create AIP Logic functions (D-15).
+
+### D-22 · One provenance register for every input, real or notional
+- **Decision:** `docs/DATA_SOURCES.md` lists every input with its source link, publisher and date, what it is used for, and how it was checked; notional items list their basis (invented, assumption, simulated) and why they are shaped that way. The README summarizes it in a two-column table, and the deck has a slide for it. Every statistic quoted in the deck has a citation checked against the source text (for example, the 25–30-year vs 4–7-year figures, DSP Journal Jul/Sep 2014, p. 4).
+- **Why:** A reviewer has to know which numbers describe the world and which describe the method. Extraction scores are real (real documents, verified key); forecast and option numbers are a method test on simulated demand. Saying so up front makes the results credible rather than weaker. Names get the same treatment: Heron, Kite, Petrel and Dana are invented and stated as such, and real part numbers appear only with their real notice status.
+- **Alternative:** Keep sourcing notes scattered across `data/notices/SOURCES.md`, slide footers and decision entries.
+- **Why rejected:** Scattered notes can't be checked in one pass, and one missed "notional" label is enough to make a reviewer doubt every number.
 

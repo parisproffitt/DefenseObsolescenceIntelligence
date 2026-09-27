@@ -91,7 +91,15 @@ The governing principle: **code for identity and arithmetic, ML for uncertainty,
 
 ## 5. Data and Ontology
 
-**Sources.** The notices and their 230 affected part numbers, dates and replacements are real (Microchip CAAN-02OLLE763, Intel PDN2401). Program sustainment data is not public, so programs, bills of materials, inventory, costs and six years of monthly demand are notional and labeled as such. No employer data is used.
+**Sources.** Every input is either real and public or notional and labeled; the full register, with links and how each item was checked, is [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md).
+
+| Real and public | Notional (fictional) |
+|---|---|
+| Microchip notice [CAAN-02OLLE763](https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/7131/CAAN-02OLLE763.pdf) (2025-06-06) and Intel [PDN2401](https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/5787/PDN2401_Rev1.0.0.pdf) (2024-01-15) | Programs Heron, Kite and Petrel, and the engineer Dana |
+| Their 230 affected part numbers, dates and replacements, verified against the notice text both ways ([D-20](DECISIONS.md)) | Assemblies, bills of materials (non-notice parts carry an `NTL-` prefix), stock, unit costs, redesign cost and time |
+| DoD [SD-22 DMSMS Guidebook](https://www.dau.edu/tools/t/SD-22-Diminishing-Manufacturing-Sources-and-Material-Shortages-(DMSMS)-Guidebook) (process); [DSP Journal, 2014](https://www.dsp.dla.mil/Portals/26/Documents/Publications/Journal/140901-DSPJ.pdf) (25–30-year service life vs 4–7-year support) | Six years of monthly demand (simulated, fixed seed); holding and growth assumptions |
+
+Program sustainment data is not public, which is why the second column is notional. No employer data is used.
 
 **Ingestion.** Program data arrives as it would from a customer: spreadsheet exports with inconsistent headers, padded and lower-case part numbers, a distributor suffix, and dates stored as text. Python transforms in Foundry clean it using the same normalization function as the matching step, and each table enforces its primary key as a build check ([D-16](DECISIONS.md)).
 

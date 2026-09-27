@@ -1,6 +1,7 @@
 # CONTINUUM — Public Data Sources
 
 All data is public. Real notices and part numbers; notional programs, inventory, and demand history.
+The authoritative provenance register is `docs/DATA_SOURCES.md` (D-22); this file is the original search log.
 Commit links and metadata only; keep the PDFs themselves inside Foundry / local (they are manufacturer documents).
 
 ## 1. End-of-life notices (the unstructured input)

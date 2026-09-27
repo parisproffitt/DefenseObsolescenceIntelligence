@@ -40,7 +40,7 @@ declares a replacement compatible and never computes numbers in prose.
   Barlow Semi Condensed (headings, big numbers) + Barlow (body) + JetBrains Mono (labels);
   faint crosshair-grid background, corner marks and a right-edge ruler on every slide;
   illustrations are white/gray engineering wireframes (isometric parts, planforms);
-  doc-ID header and page number on every slide (25 slides). Titles say plainly what the
+  doc-ID header and page number on every slide (26 slides). Titles say plainly what the
   slide shows; no taglines.
 
 ## Definition of done (work through in order, without stopping to ask)
