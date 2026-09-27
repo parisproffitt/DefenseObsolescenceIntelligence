@@ -32,7 +32,7 @@ It organizes the work in five steps. CONTINUUM follows them rather than inventin
 | Identify | "Identify items with immediate or near-term obsolescence issues" | AIP reads the notice; code matches it to every BOM; autonomous intake (D-23) |
 | Assess | "Identify and prioritize the items and assemblies most at risk" for readiness | Impact cases: coverage, supply gap, severity, ranked |
 | Analyze | "Develop a set of potential DMSMS resolutions… Determine the most cost-effective resolution" | Calibrated demand range; three costed courses of action; AIP memo |
-| Implement | "Budget, fund, contract or arrange for, schedule, and execute the selected resolutions" | Dana approves; one Action opens the purchase request and engineering review |
+| Implement | "Budget, fund, contract or arrange for, schedule, and execute the selected resolutions" | Steve approves; one Action opens the purchase request and engineering review |
 
 Resolution options named in SD-22 and used here: life-of-need (life-of-type) procurement,
 alternative or substitute items, redesign. The notice-driven, reactive case shown in the

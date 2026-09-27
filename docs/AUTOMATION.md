@@ -1,7 +1,7 @@
-# Autonomous intake: from a new notice to Dana's queue with no one touching it (D-23)
+# Autonomous intake: from a new notice to Steve's queue with no one touching it (D-23)
 
 **Goal.** A new end-of-life notice should flow all the way to a costed, explained impact
-case, with Dana notified, without anyone running anything by hand. The one step that
+case, with Steve notified, without anyone running anything by hand. The one step that
 stays human is the decision itself: approving a purchase and a redesign commits money
 and cannot be undone (D-05).
 
@@ -22,10 +22,10 @@ matching → impact → forecast → options  (the existing transforms, unchange
 Ontology sync                Impact Case objects appear / update
       ▼  Automate: "Impact Case added (CRITICAL/WATCH), severity became CRITICAL,
       ▼            or a Review Flag was added"
-Dana is notified             in-platform notification + email, linking to the Workshop app,
+Steve is notified             in-platform notification + email, linking to the Workshop app,
                              where the AIP memo is already drafted next to Approve
       ▼
-Dana approves (human)        Ontology Action writes status, purchase request, review
+Steve approves (human)        Ontology Action writes status, purchase request, review
 ```
 
 ## The gate (why autonomy is safe here)
@@ -42,7 +42,7 @@ checks what can be checked from the notice alone (tested in `tests/test_gate.py`
 | **Every part number in the text was extracted** | **Silently dropped rows, the costly error** |
 
 A notice with any rejected row or any missed part number is `HELD_FOR_REVIEW`: its rows
-become review flags and Dana is notified to check it, instead of the pipeline acting on
+become review flags and Steve is notified to check it, instead of the pipeline acting on
 a partial list. This is the same reverse check that verified the answer key (D-20),
 reused as a production control.
 
@@ -52,14 +52,14 @@ reused as a production control.
 | `raw/notice_inbox` | Dataset (demo: a transform that "releases" notices one at a time) | Terminal agent (MCP) |
 | Extraction + gate transforms | Python transforms with a language model input | Terminal agent, after the Libraries step |
 | Trigger on new data | Build schedule on `raw/notice_inbox` → downstream | Manual, `MANUAL_STEPS.md` step 6a |
-| Notification to Dana | Automate (object-set condition → notification effect) | Manual, step 6b |
+| Notification to Steve | Automate (object-set condition → notification effect) | Manual, step 6b |
 | Memo already drafted | `draftDecisionMemo` in the Workshop app | Manual, step 4a |
 
 ## Demo moment (about 20 seconds)
 Start with only CAAN-02OLLE763 released. On camera, release Intel PDN2401 into the inbox
 (one row flips in `raw/notice_inbox`, or re-run the release transform). The schedule
 fires, and within minutes a new Kite impact case appears, flagged for a tin-whisker
-review because the replacement changes the lead finish, and Dana gets a notification.
+review because the replacement changes the lead finish, and Steve gets a notification.
 If the build is too slow to film live, film the notification and the new case after
 the build, and say how long it took.
 

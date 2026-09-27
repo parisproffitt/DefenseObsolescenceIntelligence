@@ -94,7 +94,7 @@ The MCP created the action (`approve-course-of-action`,
   with quantity **500** and cost **$92,500** and one Engineering Review exist, both
   linked to the case.
 
-## 4. Build Dana's Workshop app (step 5)
+## 4. Build Steve's Workshop app (step 5)
 No MCP tool builds Workshop modules. The Ontology gives the app everything it needs,
 so this is layout only: no logic lives in the app (D-09). About 30 minutes.
 **New → Workshop module** `CONTINUUM – Obsolescence decisions`, saved in
@@ -166,9 +166,9 @@ The second AIP Logic function: AIP writes the memo on the decision screen; code 
   WATCH; add a second condition *Object modified* → `severity` changed to CRITICAL;
   **and a third: *Objects added to object set* → Review Flag (any type).** The demo's own
   release (PDN2401) produces a **LOW** Kite case (its buy date passed in 2024; 164 months
-  of stock) plus a FINISH_CHANGE flag, so without the third condition Dana gets no
+  of stock) plus a FINISH_CHANGE flag, so without the third condition Steve gets no
   notification on camera (D-25).
-- Effect: *Notification* to yourself (Dana), title `{severity}: {title}`, body
+- Effect: *Notification* to yourself (Steve), title `{severity}: {title}`, body
   `{rationale}`, link to the Workshop module. Turn on email as well if offered.
 - **Check:** after 6a's test build, a notification for the Kite case arrives.
 - **Screenshot:** the notification (`docs/screenshots/automate-notification.png`).
@@ -181,7 +181,7 @@ builds, and switches `analysis/impact` to `clean/notice_lines_live` only if CAAN
 is RELEASED with 110 accepted rows and the invariants hold by SQL afterwards (D-25).
 
 ## 5. Optional polish
-- Upload the two notice PDFs to a media set `notices/notice_pdfs` so Dana can open the
+- Upload the two notice PDFs to a media set `notices/notice_pdfs` so Steve can open the
   source next to the extracted rows (PDFs stay out of git).
 - Add `analysis/tradeoff_curve` as a Contour chart (x `buy_qty`, y `p_shortage` and
   `expected_excess_usd`) and embed it under the COA table.

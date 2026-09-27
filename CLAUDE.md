@@ -9,7 +9,7 @@ AI assistance (explicitly permitted); Paris must be able to explain every choice
 DMSMS obsolescence decision intelligence. A manufacturer end-of-life notice (real:
 Microchip CAAN-02OLLE763, Intel PDN2401) → part matching against notional program
 BOMs → coverage / supply-gap math → calibrated demand forecast → courses of action →
-the engineer (Dana) approves → Ontology Action updates state.
+the engineer (Steve) approves → Ontology Action updates state.
 Programs Heron, Kite, Petrel are fictional. Scenario date 2025-06-10.
 
 Read first: `README.md`, `DECISIONS.md` (D-01…), `docs/FOUNDRY_BUILD.md`. Domain source of truth: DoD SD-22 (`docs/RESEARCH.md`).
@@ -55,7 +55,7 @@ declares a replacement compatible and never computes numbers in prose.
    `eval_extraction.score`; compare a small and a frontier model; record real numbers.
 5. **Action + app:** action type *Approve course of action* (sets Impact Case
    `status`, creates Procurement Request and Engineering Review); Workshop app for
-   Dana: impact cases → Heron detail → forecast range → COAs → approve.
+   Steve: impact cases → Heron detail → forecast range → COAs → approve.
 6. **Docs:** DECISIONS.md entry for every choice, README + build guide current,
    deck slides updated (plan, AIP evaluation numbers, screenshots described), and a
    `docs/DEMO_SCRIPT.md` under 5 minutes that matches what was actually built.

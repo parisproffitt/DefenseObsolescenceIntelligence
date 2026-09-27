@@ -53,7 +53,7 @@ def impact(impact_cases, review_flags, programs, bom_lines, inventory, demand_mo
     flags = pd.concat(flags, ignore_index=True)
 
     # Forecast range over each case's redesign window: same sampler and seed as the
-    # COA bridge buy, so the range Dana sees and the buy quantity agree.
+    # COA bridge buy, so the range Steve sees and the buy quantity agree.
     rng = []
     for c in cases.itertuples():
         fc, _ = forecast(_history(data["demand_monthly"], c.program_id, c.part_number),

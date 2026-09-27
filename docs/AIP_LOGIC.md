@@ -87,7 +87,7 @@ Report numbers on the AIP evaluation slide; do not round up.
 # AIP Logic — `draftDecisionMemo` (D-21)
 
 The second AIP Logic function. It turns the computed options for one Impact Case into
-the memo Dana would otherwise write by hand. It never computes, recommends or judges fit.
+the memo Steve would otherwise write by hand. It never computes, recommends or judges fit.
 
 **Input:** one Impact Case object. The function reads its properties and its linked
 Course of Action objects (Search Around → Courses of Action), and the notice's

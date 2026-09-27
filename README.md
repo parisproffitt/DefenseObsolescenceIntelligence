@@ -95,7 +95,7 @@ The governing principle: **code for identity and arithmetic, ML for uncertainty,
 
 | Real and public | Notional (fictional) |
 |---|---|
-| Microchip notice [CAAN-02OLLE763](https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/7131/CAAN-02OLLE763.pdf) (2025-06-06) and Intel [PDN2401](https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/5787/PDN2401_Rev1.0.0.pdf) (2024-01-15) | Programs Heron, Kite and Petrel, and the engineer Dana |
+| Microchip notice [CAAN-02OLLE763](https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/7131/CAAN-02OLLE763.pdf) (2025-06-06) and Intel [PDN2401](https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/5787/PDN2401_Rev1.0.0.pdf) (2024-01-15) | Programs Heron, Kite and Petrel, and the engineer Steve |
 | Their 230 affected part numbers, dates and replacements, verified against the notice text both ways ([D-20](DECISIONS.md)) | Assemblies, bills of materials (non-notice parts carry an `NTL-` prefix), stock, unit costs, redesign cost and time |
 | DoD [SD-22 DMSMS Guidebook](https://www.dau.edu/tools/t/SD-22-Diminishing-Manufacturing-Sources-and-Material-Shortages-(DMSMS)-Guidebook) (process); [DSP Journal, 2014](https://www.dsp.dla.mil/Portals/26/Documents/Publications/Journal/140901-DSPJ.pdf) (25–30-year service life vs 4–7-year support) | Six years of monthly demand (simulated, fixed seed); holding and growth assumptions |
 

@@ -21,7 +21,7 @@ import pandas as pd
 REPO_ROOT = Path(__file__).resolve().parents[2]
 REFERENCE_DIR = REPO_ROOT / "data" / "reference"
 
-# Scenario replay: Dana receives the real Microchip notice a few days after issue.
+# Scenario replay: Steve receives the real Microchip notice a few days after issue.
 AS_OF = date(2025, 6, 10)
 HISTORY_MONTHS = 72
 
