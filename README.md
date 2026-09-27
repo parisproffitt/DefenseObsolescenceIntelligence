@@ -13,7 +13,7 @@ CONTINUUM turns a manufacturer's end-of-life notice into a program decision. It 
 | **Decision supported** | How many parts to buy before the last-time-buy window closes, and whether to start a redesign. |
 | **Approach** | Deterministic code for matching and arithmetic, a calibrated forecast for uncertainty, AIP for reading documents, and a human approval for the decision. |
 | **Demo result** | From one real Microchip notice: a program facing a 10.2-month supply gap, and a bridge-buy option that reduces shortage risk from 93% to 14%. |
-| **Status** | Data pipelines, Ontology, decision logic and the approval Action are built in Foundry. AIP model evaluation and the Workshop application are in progress. |
+| **Status** | Data pipelines and decision logic run in Foundry, verified against the reference numbers. The Ontology and the approval Action are built on a branch awaiting review. AIP model evaluation and the Workshop application are in progress ([manual steps](docs/MANUAL_STEPS.md)). |
 
 ---
 
@@ -233,6 +233,7 @@ src/continuum/        reference implementation (Python)
   coa.py              courses of action and stress test
   extraction.py       AIP extraction prompt, chunking and parsing
   eval_extraction.py  extraction scoring against ground truth
+  verify_truth.py     answer key checked against the notices, both ways
 foundry/              code deployed to Foundry (transforms, Ontology identifiers)
 data/                 notice registry and manufacturer parts lists (ground truth)
 docs/                 build guide, AIP specification, demo script, manual steps
