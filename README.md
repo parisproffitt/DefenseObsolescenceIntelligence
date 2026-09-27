@@ -236,7 +236,7 @@ src/continuum/        reference implementation (Python)
 foundry/              code deployed to Foundry (transforms, Ontology identifiers)
 data/                 notice registry and manufacturer parts lists (ground truth)
 docs/                 build guide, AIP specification, demo script, manual steps
-tests/                32 automated tests
+tests/                35 automated tests
 ```
 
 ```bash

@@ -49,11 +49,12 @@ Petrel's `A3P1000-1FGG484I` is not.
 ### 1.4 Screenshot for the video/deck
 The lineage graph (raw → clean → analysis) and the `bom_notice_matches` preview.
 
-### 1.5 Verify the ground truth against the official source (D-13)
-- Microchip: download `CAAN-02OLLE763_Affected_CPN_06062025.csv` from the PCN portal
-  (microchip.com/en-us/support/product-change-notification, search the notice ID).
-- Intel: the OPN list linked from PDN2401 (cdrdv2.intel.com/v1/dl/getContent/813534).
-Commit both to `data/reference/official/`; a test compares them to our lists.
+### 1.5 Verify the ground truth (D-13, D-20) — DONE against the notices
+`python scripts/verify_ground_truth.py <raw_notice_text.csv>` checks the key against the
+notices' text in both directions: CAAN-02OLLE763 110/110; PDN2401 120/120 parts and 100/100
+replacements; no OPN in the text is missing from the key. Optional extra: the
+manufacturers' separate parts files (manual, `docs/MANUAL_STEPS.md` step 5; both sites
+block scripted downloads).
 
 ## Phase 2 — Ontology — BUILT (on a branch; merge is manual)
 

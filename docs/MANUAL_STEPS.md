@@ -134,3 +134,8 @@ so this is layout only: no logic lives in the app (D-09). About 30 minutes.
   source next to the extracted rows (PDFs stay out of git).
 - Add `analysis/tradeoff_curve` as a Contour chart (x `buy_qty`, y `p_shortage` and
   `expected_excess_usd`) and embed it under the COA table.
+- Download the manufacturers' separate parts files (both sites block scripted downloads)
+  and commit them to `data/reference/official/`: Microchip PCN portal → search
+  `CAAN-02OLLE763` → `CAAN-02OLLE763_Affected_CPN_06062025.csv`; Intel
+  `cdrdv2.intel.com/v1/dl/getContent/813534`. The key is already verified against the
+  notices themselves (D-20); this adds a second source.
