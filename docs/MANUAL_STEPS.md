@@ -7,7 +7,8 @@ Project: `/CONTINUUM-edbe5f/Continuum`.
 
 <!-- Sections are appended as the build reaches each step. -->
 
-## 1. Approve the Ontology proposal (Phase 2 + the action)
+## 1. Approve the Ontology proposal (Phase 2 + the action) — DONE 2026-09-27
+Merged; the objects serve the invariant values (checked with the MCP: Heron 312 / 13.8 / 5.7 / 10.2 CRITICAL; hybrid 500 / $1,550,011 / 0.1425 / 0.1815).
 Everything Ontology-side was created on global branch **continuum-ontology**.
 1. Open the proposal:
    https://continuum-demo.usw-17.palantirfoundry.com/workspace/developer-branching/proposal/ri.branch..proposal.6aedeb42-43ab-456b-85fe-648ede7393b1
@@ -25,9 +26,13 @@ evaluation code is written and waiting in
 `foundry/continuum-transforms/pending/aip_extraction.py`; it needs the libraries and
 two model RIDs.
 
-**2a. Add the libraries (5 min).** Open repository `continuum-transforms` →
-left sidebar **Libraries** → search `palantir_models` → **Add and install library**;
-repeat for `language-model-service-api`. Wait for checks to pass.
+**2a. Add the libraries (5 min). NOT YET IN THE REPO (checked 2026-09-27: no library commit on any branch; `meta.yaml` lists neither).**
+Open repository `continuum-transforms` → left sidebar **Libraries** → search
+`palantir_models` → **Add and install library**; repeat for `language-model-service-api`.
+The sidebar writes a commit (updating `conda_recipe/meta.yaml` and the lock file) to the
+branch that is open, so make sure it is **master** and that the commit appears in the
+repo's history. Wait for checks to pass. Then tell the terminal agent: it does 2b–2c and
+step 6c.
 
 **2b. Pick the two models.** In the same repository, type
 `OpenAiGptChatLanguageModelInput("ri.` in any file and the picker lists the models
@@ -157,11 +162,22 @@ The second AIP Logic function: AIP writes the memo on the decision screen; code 
 
 **6b. Automate (10 min).** **New → Automate** `CONTINUUM – new impact case`.
 - Condition: *Objects added to object set* → Impact Case where `severity` is CRITICAL or
-  WATCH; add a second condition *Object modified* → `severity` changed to CRITICAL.
+  WATCH; add a second condition *Object modified* → `severity` changed to CRITICAL;
+  **and a third: *Objects added to object set* → Review Flag (any type).** The demo's own
+  release (PDN2401) produces a **LOW** Kite case (its buy date passed in 2024; 164 months
+  of stock) plus a FINISH_CHANGE flag, so without the third condition Dana gets no
+  notification on camera (D-25).
 - Effect: *Notification* to yourself (Dana), title `{severity}: {title}`, body
   `{rationale}`, link to the Workshop module. Turn on email as well if offered.
 - **Check:** after 6a's test build, a notification for the Kite case arrives.
 - **Screenshot:** the notification (`docs/screenshots/automate-notification.png`).
+
+**6c. Intake extraction + gate (terminal agent, after 2a).** Already written and tested
+locally with a stand-in model: `foundry/continuum-transforms/pending/intake_aip.py`
+(`aip/notice_lines_auto` → gate → `aip/notice_lines_accepted`, `_rejected`,
+`aip/notice_intake_status` → `clean/notice_lines_live`). The agent sets `KEPT`, drops it in,
+builds, and switches `analysis/impact` to `clean/notice_lines_live` only if CAAN-02OLLE763
+is RELEASED with 110 accepted rows and the invariants hold by SQL afterwards (D-25).
 
 ## 5. Optional polish
 - Upload the two notice PDFs to a media set `notices/notice_pdfs` so Dana can open the

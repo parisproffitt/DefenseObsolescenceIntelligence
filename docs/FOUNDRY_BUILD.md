@@ -104,6 +104,15 @@ life-of-type 5,640 / $1,525,140 / 9.8% / 99.15%; redesign only 0 / $1,450,000 / 
 94.3%; **hybrid 500 / $1,550,011 / 14.25% / 18.15%**, identical to the reference run.
 Heron's forecast range over the 24-month window is P10 337, P50 573, P90 880 units.
 
+## Phase 3b — Autonomous intake (D-23, D-25) — PARTLY BUILT
+| Dataset | Made by | State |
+|---|---|---|
+| `raw/notice_releases` | uploaded (notice_id, released_at); CAAN-02OLLE763 only | Built |
+| `raw/notice_inbox` | `intake.py`: `raw_notice_text` filtered to released notices | Built |
+| `aip/notice_lines_auto`, `aip/notice_lines_accepted`, `aip/notice_lines_rejected`, `aip/notice_intake_status`, `clean/notice_lines_live` | `pending/intake_aip.py` (kept model, page mode, `gate.py`) | Waits on the Libraries step |
+
+`analysis/impact` keeps reading `clean/notice_lines` until the live lines pass the D-25 checks.
+
 ## Phase 4 — AIP, Action, app
 See `docs/AIP_LOGIC.md` (extraction and its evaluation) and `docs/MANUAL_STEPS.md`.
 

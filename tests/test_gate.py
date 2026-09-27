@@ -43,3 +43,19 @@ def test_bad_quote_and_bad_date_are_reasons():
     _, rej, _ = gate(lines, PAGES)
     reasons = rej.iloc[0]["gate_reasons"]
     assert "quote not found" in reasons and "valid YYYY-MM-DD" in reasons
+
+
+def test_nan_cells_from_parquet_do_not_crash():
+    """Tables read back from parquet hold NaN where a column mixes values and nulls."""
+    import numpy as np
+
+    pages = pd.DataFrame({"notice_id": ["N"], "page": [1], "text": ["EP4CE10E22I7 -> EP4CE10E22I7N; EP2C5Q208C8"]})
+    lines = pd.DataFrame({
+        "notice_id": ["N", "N"], "part_number": ["EP4CE10E22I7", "EP2C5Q208C8"],
+        "last_time_buy": ["2024-07-15", np.nan], "last_time_ship": [np.nan, np.nan],
+        "replacement_part_number": ["EP4CE10E22I7N", np.nan],
+        "source_quote": ["EP4CE10E22I7 -> EP4CE10E22I7N", "EP2C5Q208C8"],
+    })
+    accepted, rejected, status = gate(lines, pages)
+    assert len(accepted) == 2 and rejected.empty
+    assert status.iloc[0]["status"] == "RELEASED"

@@ -20,7 +20,8 @@ code gate (gate.py)          aip/notice_lines_accepted  rows that pass every che
 matching → impact → forecast → options  (the existing transforms, unchanged)
       ▼
 Ontology sync                Impact Case objects appear / update
-      ▼  Automate: "Impact Case added or severity became CRITICAL"
+      ▼  Automate: "Impact Case added (CRITICAL/WATCH), severity became CRITICAL,
+      ▼            or a Review Flag was added"
 Dana is notified             in-platform notification + email, linking to the Workshop app,
                              where the AIP memo is already drafted next to Approve
       ▼
@@ -61,3 +62,20 @@ fires, and within minutes a new Kite impact case appears, flagged for a tin-whis
 review because the replacement changes the lead finish, and Dana gets a notification.
 If the build is too slow to film live, film the notification and the new case after
 the build, and say how long it took.
+
+## Build status (2026-09-27)
+| Piece | State |
+|---|---|
+| `raw/notice_releases` (the release switch; CAAN-02OLLE763 only) | Uploaded |
+| `raw/notice_inbox` (`intake.py`) | Built in Foundry |
+| Extraction, gate, `clean/notice_lines_live` (`pending/intake_aip.py`) | Written; tested locally with a stand-in model; waits on the Libraries step |
+| `analysis/impact` input | Still `clean/notice_lines` (switch only after the checks in D-25) |
+| Schedule, Automate | UI (`MANUAL_STEPS.md` 6a, 6b) |
+
+Local run of the whole loop with a stand-in model: CAAN-02OLLE763 RELEASED (110 accepted,
+0 rejected, 0 missed); impact on the live lines reproduces every invariant. Releasing
+PDN2401: RELEASED (120/0/0), 230 live lines, one new case **Kite · EP4CE10E22I7 · LOW**
+(buy date passed 10.8 months before the scenario date) and one new flag,
+**FINISH_CHANGE** (EP4CE10E22I7 → EP4CE10E22I7N). The on-camera moment is therefore the
+new flag and case, not a CRITICAL alert; the Automate rule includes Review Flags so it fires.
+

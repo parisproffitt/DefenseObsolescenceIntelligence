@@ -26,8 +26,16 @@ def _squash(s: str) -> str:
     return _WS.sub(" ", s or "").strip()
 
 
+def _text(v) -> str:
+    """A cell as stripped text; None, NaN and pd.NA become "" (tables read back from
+    parquet hold NaN where a column mixes values and nulls)."""
+    if v is None or (not isinstance(v, str) and pd.isna(v)):
+        return ""
+    return str(v).strip()
+
+
 def _is_date(v) -> bool:
-    if v is None or (isinstance(v, float) and pd.isna(v)):
+    if not _text(v):
         return True  # a null date is allowed (the notice may not state it)
     try:
         date.fromisoformat(str(v)[:10])
@@ -49,7 +57,7 @@ def gate(lines: pd.DataFrame, pages: pd.DataFrame) -> tuple[pd.DataFrame, pd.Dat
         squashed, tokens = _squash(text), set(_TOKEN.findall(text))
         seen = set()
         for r in grp.to_dict("records"):
-            pn = (r.get("part_number") or "").strip()
+            pn = _text(r.get("part_number"))
             reasons = []
             if not pn or pn not in tokens:
                 reasons.append("part number not found verbatim in the notice")
@@ -59,17 +67,17 @@ def gate(lines: pd.DataFrame, pages: pd.DataFrame) -> tuple[pd.DataFrame, pd.Dat
                 reasons.append("duplicate row")
             if not (_is_date(r.get("last_time_buy")) and _is_date(r.get("last_time_ship"))):
                 reasons.append("date is not a valid YYYY-MM-DD")
-            q = _squash(r.get("source_quote") or "")
+            q = _squash(_text(r.get("source_quote")))
             if not q or q not in squashed:
                 reasons.append("source quote not found in the notice")
-            repl = (r.get("replacement_part_number") or "").strip()
+            repl = _text(r.get("replacement_part_number"))
             if repl and repl not in tokens:
                 reasons.append("replacement not found verbatim in the notice")
             seen.add(pn)
             (rejected if reasons else accepted).append({**r, "gate_reasons": "; ".join(reasons) or None})
         opns_in_text = {t for t in tokens if parse(t).manufacturer}
         found = {a["part_number"] for a in accepted if a["notice_id"] == nid}
-        repls = {(a.get("replacement_part_number") or "") for a in accepted if a["notice_id"] == nid}
+        repls = {_text(a.get("replacement_part_number")) for a in accepted if a["notice_id"] == nid}
         missed = sorted(opns_in_text - found - repls)
         status.append({
             "notice_id": nid,
