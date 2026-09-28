@@ -125,6 +125,23 @@ The MCP created the action (`approve-course-of-action`,
   linked to the case.
 
 ## 4. Build Steve's Workshop app (step 5)
+
+**4.0 Value formatting (display only; the MCP object-type tool has no formatting field).**
+Ontology Manager → object type → **Properties** → click the property → **Value formatting**
+→ toggle **Numeric formatting** on → set as below → check **Preview result** → **Save**
+(saving the Ontology asks for a short change description).
+
+| Object type · property | Base type | Settings | Preview with → expect |
+|---|---|---|---|
+| Impact Case · Demand over redesign window, P10 / P50 / P90 | Standard (no unit) | Max fraction digits 0, Use grouping on | 573.0 → 573 |
+| Impact Case · Coverage (months), Months to last-time buy, Supply gap (months) | Standard | Min and max fraction digits 1 | 10.2 → 10.2 |
+| Course of Action · Total cost (USD), Procurement (USD) | Currency, USD | Notation Compact, max fraction digits 2 | 1550011 → $1.55M |
+| Course of Action · Shortage risk, Shortage risk if demand grows 5%/yr | Percentage | Max fraction digits 0 | 0.1425 → 14% |
+
+Values are stored as fractions (0.1425), so the percentage preview must show 14%, not 0%
+or 1,425%. If it shows 0.14%, the base type is treating the value as already in percent;
+use Prefix/suffix instead and leave the number unformatted. Compact notation needs 2
+fraction digits to show $1.55M (0 digits would show $2M).
 No MCP tool builds Workshop modules. The Ontology gives the app everything it needs,
 so this is layout only: no logic lives in the app (D-09). About 30 minutes.
 **New → Workshop module** `CONTINUUM – Obsolescence decisions`, saved in
