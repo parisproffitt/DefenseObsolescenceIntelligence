@@ -21,11 +21,16 @@ CONTINUUM turns a manufacturer's end-of-life notice into a program decision. It 
 
 **Video:** *to be added on completion (target: October 5, 2026).*
 
+**Steve's Workshop app** — impact cases ranked by supply gap (left), the selected case's coverage, gap and calibrated demand range (middle), and the three costed courses of action with stress-test risk (right):
+
+![CONTINUUM Workshop app with the Heron case selected](docs/screenshots/workshop-app.png)
+
+**One-click approval** — the *Approve course of action* Ontology Action opens pre-filled from the selected case and option; the purchase request and engineering review it creates are filled from those objects, not typed:
+
+![Approve course of action form](docs/screenshots/action-approve.png)
+
 | Screen | Shows |
 |---|---|
-| Impact cases *(screenshot to be added)* | Every program affected by a notice, ranked by severity |
-| Heron detail *(screenshot to be added)* | Stock coverage, the supply gap, and the forecast range |
-| Courses of action *(screenshot to be added)* | Three costed options and the approval Action |
 | Decision memo *(screenshot to be added)* | The memo AIP drafts from the Ontology, beside *Approve* |
 | AIP evaluation *(screenshot to be added)* | Extraction accuracy against the manufacturers' parts lists |
 | Data lineage *(screenshot to be added)* | Raw exports → clean tables → analysis in Foundry |
