@@ -38,9 +38,9 @@ declares a replacement compatible and never computes numbers in prose.
   (`project/slides/<id>.html`), republish to that URL. Style: near-black #08090A, off-white
   #EDEDEA, grays #B8BBBF/#8B8F94, ONE signal color #FF5B1F for critical items only;
   Barlow Semi Condensed (headings, big numbers) + Barlow (body) + JetBrains Mono (labels);
-  faint crosshair-grid background, corner marks and a right-edge ruler on every slide;
+  faint crosshair-grid background and corner marks on every slide;
   illustrations are white/gray engineering wireframes (isometric parts, planforms);
-  "CONTINUUM" header and page number on every slide (34 slides); no section numbers or decision codes on slides, body text 28px+ where it fits. Titles say plainly what the
+  "CONTINUUM" header and page number on every slide (34 slides); no section numbers or decision codes on slides; labels and footers in sentence-case Barlow (JetBrains Mono only for the header, part numbers and code); headlines 72px; body text 28px+ where it fits; no right-edge ruler. Titles say plainly what the
   slide shows; no taglines.
 
 ## Definition of done (work through in order, without stopping to ask)
