@@ -35,7 +35,7 @@ two model RIDs.
 The code-repository route is blocked: CI rejects any language-model ID that is not a
 project reference (a made-up ID gets the identical `Jemma:AccessWithoutImportDenied`), and
 the editor offers no model dropdown to import from. Pipeline Builder picks models from a
-list instead. The terminal agent has built `aip/extraction_prompts` (18 rows: one per
+list instead. `aip/extraction_prompts` is built in code (18 rows: one per
 model call; `document` mode = 2 calls, `page` mode = 16; column `prompt` holds the full
 user message).
 1. **If Use LLM later shows no models:** Control Panel → **AIP settings** → grant
@@ -58,7 +58,7 @@ user message).
    (e.g. GPT-4.1 / GPT-5 / Claude Sonnet), identical settings → output
    `aip/extraction_frontier_raw`.
 7. **Save → Deploy**, and build both outputs.
-8. Tell the terminal agent the two model names. It installs `aip_parse.py` (parses with
+8. Record the two model names. `aip_parse.py` (parses with
    the tested `parse_response`, records every unparsable reply) and builds
    `aip/extraction_scores`.
 
@@ -207,8 +207,7 @@ The second AIP Logic function: AIP writes the memo on the decision screen; code 
 **Create schedule**. Trigger: *When `raw/notice_inbox` is updated*. Target: *Build
 `analysis/coas` and all upstream datasets* (or select `aip/notice_intake_status`,
 `clean/notice_lines`, `analysis/impact_cases`, `analysis/coas`). Save and enable.
-- **Check:** release PDN2401 into the inbox (`raw/notice_inbox`, see the terminal agent's
-  note); the schedule starts a build within a minute without you clicking Build.
+- **Check:** release PDN2401 into the inbox (`raw/notice_inbox`, see `docs/AUTOMATION.md`); the schedule starts a build within a minute without you clicking Build.
 
 **6b. Automate (10 min).** **New → Automate** `CONTINUUM – new impact case`.
 - Condition: *Objects added to object set* → Impact Case where `severity` is CRITICAL or
@@ -222,10 +221,10 @@ The second AIP Logic function: AIP writes the memo on the decision screen; code 
 - **Check:** after 6a's test build, a notification for the Kite case arrives.
 - **Screenshot:** the notification (`docs/screenshots/automate-notification.png`).
 
-**6c. Intake extraction + gate (terminal agent, after 2a).** Already written and tested
+**6c. Intake extraction + gate (code, after 2a).** Already written and tested
 locally with a stand-in model: `foundry/continuum-transforms/pending/intake_aip.py`
 (`aip/notice_lines_auto` → gate → `aip/notice_lines_accepted`, `_rejected`,
-`aip/notice_intake_status` → `clean/notice_lines_live`). The agent sets `KEPT`, drops it in,
+`aip/notice_intake_status` → `clean/notice_lines_live`). Set `KEPT`, drop it in,
 builds, and switches `analysis/impact` to `clean/notice_lines_live` only if CAAN-02OLLE763
 is RELEASED with 110 accepted rows and the invariants hold by SQL afterwards (D-25).
 

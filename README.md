@@ -295,7 +295,6 @@ pytest
 | [`DECISIONS.md`](DECISIONS.md) | Every design decision, the alternative considered, and the reason |
 | [`docs/FOUNDRY_BUILD.md`](docs/FOUNDRY_BUILD.md) | How the system is built in Foundry |
 | [`docs/AIP_LOGIC.md`](docs/AIP_LOGIC.md) | Extraction prompt, output schema and evaluation |
-| [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) | The five-minute demonstration |
 | [`docs/MANUAL_STEPS.md`](docs/MANUAL_STEPS.md) | Steps completed in the Foundry interface |
 </details>
 

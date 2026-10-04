@@ -49,8 +49,8 @@ reused as a production control.
 ## What each piece is in Foundry
 | Piece | Foundry feature | Built by |
 |---|---|---|
-| `raw/notice_inbox` | Dataset (demo: a transform that "releases" notices one at a time) | Terminal agent (MCP) |
-| Extraction + gate transforms | Python transforms with a language model input | Terminal agent, after the Libraries step |
+| `raw/notice_inbox` | Dataset (demo: a transform that "releases" notices one at a time) | Palantir MCP |
+| Extraction + gate transforms | Python transforms with a language model input | Python transforms (code repository) |
 | Trigger on new data | Build schedule on `raw/notice_inbox` → downstream | Manual, `MANUAL_STEPS.md` step 6a |
 | Notification to Steve | Automate (object-set condition → notification effect) | Manual, step 6b |
 | Memo already drafted | `draftDecisionMemo` in the Workshop app | Manual, step 4a |

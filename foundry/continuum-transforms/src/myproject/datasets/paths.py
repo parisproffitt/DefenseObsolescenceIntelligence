@@ -1,4 +1,4 @@
-"""Foundry locations. Names match the README tables (CLAUDE.md working rules)."""
+"""Foundry locations. Names match the README tables (kept identical by convention)."""
 
 PROJECT = "/CONTINUUM-edbe5f/Continuum"
 RAW = f"{PROJECT}/raw"            # as delivered: messy exports + uploaded notice lists
