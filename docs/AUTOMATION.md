@@ -68,7 +68,7 @@ the build, and say how long it took.
 |---|---|
 | `raw/notice_releases` (the release switch; CAAN-02OLLE763 only) | Uploaded |
 | `raw/notice_inbox` (`intake.py`) | Built in Foundry |
-| Extraction, gate, `clean/notice_lines_live` (`pending/intake_aip.py`) | Written; tested locally with a stand-in model; waits on the Libraries step |
+| Extraction, gate, `clean/notice_lines_live` (`pending/intake_aip.py`) | Written; tested locally with a stand-in model. Measured results (D-26) set it to Claude Sonnet in **document mode**, and add a gate check that holds a notice whose rows all lack a buy date. Deploying it is the next step |
 | `analysis/impact` input | Still `clean/notice_lines` (switch only after the checks in D-25) |
 | Schedule, Automate | UI (`MANUAL_STEPS.md` 6a, 6b) |
 

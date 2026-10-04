@@ -109,7 +109,7 @@ Heron's forecast range over the 24-month window is P10 337, P50 573, P90 880 uni
 |---|---|---|
 | `raw/notice_releases` | uploaded (notice_id, released_at); CAAN-02OLLE763 only | Built |
 | `raw/notice_inbox` | `intake.py`: `raw_notice_text` filtered to released notices | Built |
-| `aip/notice_lines_auto`, `aip/notice_lines_accepted`, `aip/notice_lines_rejected`, `aip/notice_intake_status`, `clean/notice_lines_live` | `pending/intake_aip.py` (kept model, page mode, `gate.py`) | Waits on the Libraries step |
+| `aip/notice_lines_auto`, `aip/notice_lines_accepted`, `aip/notice_lines_rejected`, `aip/notice_intake_status`, `clean/notice_lines_live` | `pending/intake_aip.py` (Claude Sonnet, **document mode** per the D-26 results, `gate.py`) | Written and tested locally; deploy is the next step |
 
 `analysis/impact` keeps reading `clean/notice_lines` until the live lines pass the D-25 checks.
 

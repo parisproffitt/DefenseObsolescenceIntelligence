@@ -13,13 +13,14 @@ CONTINUUM turns a manufacturer's end-of-life notice into a program decision. It 
 | **Decision supported** | How many parts to buy before the last-time-buy window closes, and whether to start a redesign. |
 | **Approach** | Deterministic code for matching and arithmetic, a calibrated forecast for uncertainty, AIP for reading documents, and a human approval for the decision. |
 | **Demo result** | From one real Microchip notice: a program facing a 10.2-month supply gap, and a bridge-buy option that reduces shortage risk from 93% to 14%. |
-| **Status** | Built in Foundry: data pipelines and decision logic (numbers equal the tested reference), the Ontology (12 object types, 15 links, merged after review), the *Approve course of action* Action with a self-filling form, and Steve's published Workshop app. The extraction model comparison runs in Pipeline Builder. The intake gate and memo number check are built and tested in code; wiring the schedule, notification and memo panel is the next step ([manual steps](docs/MANUAL_STEPS.md)). |
+| **AIP result** | On the two real notices (230 part numbers), Claude Sonnet extracted every part with 100% precision and exact dates, replacements and citations; a smaller model found every part but dropped every date on the Intel notice, so the larger model is kept. |
+| **Status** | Built in Foundry: data pipelines and decision logic (numbers equal the tested reference), the Ontology (12 object types, 15 links, merged after review), the *Approve course of action* Action with a self-filling form, Steve's published Workshop app, and the two-model AIP extraction in Pipeline Builder, scored. Designed and tested in code, not yet wired in Foundry: the decision memo panel and the autonomous intake schedule ([manual steps](docs/MANUAL_STEPS.md)). |
 
 ---
 
 ## Demonstration
 
-**Video:** *link added on submission (October 5, 2026).* **Design review deck:** 34 slides covering the problem, data, architecture, AIP use, the app, the decision and how it was built.
+A five-minute video walkthrough and a 34-slide design review deck (problem, data, architecture, AIP use, the app, the decision and how it was built) accompany this repository.
 
 **Steve's Workshop app** — impact cases ranked by supply gap (left), the selected case's coverage, gap and calibrated demand range (middle), and the three costed courses of action with stress-test risk (right):
 
@@ -32,14 +33,6 @@ CONTINUUM turns a manufacturer's end-of-life notice into a program decision. It 
 **AIP extraction, two models side by side** — Pipeline Builder runs GPT-5.4 nano and Claude Sonnet as *Use LLM* steps over the same 18 prompts; a tested code transform scores both against the 230-part answer key (D-26):
 
 ![Pipeline Builder with two Use LLM steps](docs/screenshots/aip-pipeline.png)
-
-| Screen | Shows |
-|---|---|
-| Decision memo *(screenshot to be added)* | The memo AIP drafts from the Ontology, beside *Approve* |
-| AIP evaluation | Extraction accuracy against the manufacturers' parts lists (scores below, from `aip/extraction_scores`) |
-| Data lineage *(screenshot to be added)* | Raw exports → clean tables → analysis in Foundry |
-
-<!-- Screenshots: docs/screenshots/{workshop-cases,workshop-heron,workshop-memo,action-approve,aip-logic-eval,lineage}.png -->
 
 ---
 
@@ -124,8 +117,6 @@ def bom_lines(out, raw):
 
 **Ontology.** The model mirrors how the engineer reasons: a notice line identifies a part; the part appears on bill-of-materials lines within assemblies; assemblies belong to programs. An impact case joins one notice to one program's part, and holds its courses of action. Keys are stable, readable strings (for example `CAAN-02OLLE763|A3P1000-1PQG208I`), so links survive data regeneration and can be audited by eye. Monthly demand remains a dataset because no workflow acts on a single month ([D-11](DECISIONS.md)). Ontology changes are made on a branch and merged after review ([D-17](DECISIONS.md)).
 
-<!-- SCREENSHOT: Ontology graph around Heron (docs/screenshots/ontology.png) -->
-
 ## 6. Demand forecasting (ML)
 
 **Why ML.** The buy decision depends on how many parts will be consumed over the redesign period. Spare-parts demand is intermittent (many zero months, then spikes), so a single-number forecast conceals the risk the decision is about. CONTINUUM forecasts cumulative demand as a distribution and sizes purchases at a stated confidence level.
@@ -162,9 +153,9 @@ The median forecast is no more accurate than a simple average; the value of the 
 
 | Step | AIP capability | Output | Rule |
 |---|---|---|---|
-| Read the notice | AIP Logic `extractNoticeLines` | Notice Line objects, one per part, each with a verbatim quote | Never normalizes or invents a part number |
-| Choose the model | Language models in a Foundry transform | Field-by-field scores for a small and a frontier model | Keep the cheaper model where scores hold |
-| Explain the options | AIP Logic `draftDecisionMemo`, reading Impact Case and Course of Action objects | The memo shown in Workshop beside *Approve* | Every number must appear in the Ontology input (`memo.unsupported_numbers`); no recommendation |
+| Read the notice | Pipeline Builder *Use LLM* (prompt and schema built in code) | One row per part, each with a verbatim quote; buy-changing caveats copied word for word | Never normalizes or invents a part number |
+| Choose the model | Two *Use LLM* steps on the same prompts, scored by a tested transform | Field-by-field scores for GPT-5.4 nano and Claude Sonnet | Keep the cheaper model only if its scores hold; here they did not |
+| Explain the options (designed) | AIP Logic `draftDecisionMemo`, reading Impact Case and Course of Action objects | A memo beside *Approve* | Every number must appear in the Ontology input (`memo.unsupported_numbers`, built and tested); no recommendation |
 
 ```python
 def unsupported_numbers(memo: str, input_block: str) -> list[str]:
@@ -180,8 +171,6 @@ def unsupported_numbers(memo: str, input_block: str) -> list[str]:
 | GPT-5.4 nano | 100% | 100% | 47.8% / 47.8% | 99.2% | 100% |
 
 The small model found every part but returned no dates for any of the Intel notice's 120 parts, so the frontier model is kept. Splitting notices into pages made both models worse, because neither notice states its dates on page 1; full results in [`docs/AIP_LOGIC.md`](docs/AIP_LOGIC.md).
-
-<!-- SCREENSHOT: AIP Logic function and evaluation results (docs/screenshots/aip-logic-eval.png) -->
 
 **Autonomous intake.** A new notice runs end to end with no one clicking anything: a build schedule fires on arrival, AIP extracts the rows, a code gate checks every row against the notice text (and holds the notice if any part number was missed), the analysis rebuilds, and Foundry Automate notifies the engineer. The approval stays human ([D-23](DECISIONS.md), [docs/AUTOMATION.md](docs/AUTOMATION.md)).
 
@@ -227,8 +216,6 @@ The life-of-type buy depends on a 17-year forecast; the bridge buy costs approxi
 
 **The operator acts in one step.** The Action *Approve course of action* records the decision and, in the same transaction, creates a procurement request (quantity and cost copied from the selected option) and an engineering review. A case cannot be marked approved without the follow-up work that makes the decision real ([D-18](DECISIONS.md)).
 
-<!-- SCREENSHOT: Approve course of action, before and after (docs/screenshots/action-approve.png) -->
-
 ## 10. Robustness
 
 | Condition | System response |
@@ -250,12 +237,14 @@ The life-of-type buy depends on a 17-year forecast; the bridge buy costs approxi
 | Life-of-type buy | Purchase cost only | Appeared cheapest and safest | Holding cost and stress test added |
 | Data cleaning | Pipeline Builder | Would duplicate the matching logic | Transforms share one `normalize()` |
 | Scope of AI | AI-assisted matching | False alarm on a different package | Exact matching with review flags |
+| Notice chunking | Split notices into pages, page 1 attached for dates | Neither notice states its dates on page 1; Claude took the ship date as the buy date on 83 rows | Whole-notice extraction (notices are at most ~10,400 characters) |
+| Model choice | Expected the small model to suffice | GPT-5.4 nano found every part but no dates on the Intel notice | Keep Claude Sonnet; gate to hold a notice whose rows all lack a buy date |
 
 Each change is documented with its evidence in [`DECISIONS.md`](DECISIONS.md).
 
 ## 12. Limitations and next steps
 
-**Limitations.** Program data and demand are notional; forecast results validate the method, not real-world accuracy. AIP extraction accuracy is not yet measured. Costs are illustrative.
+**Limitations.** Program data and demand are notional; forecast results validate the method, not real-world accuracy. AIP extraction is measured on two notices only (230 parts); more notices are needed before trusting it on new manufacturers. Costs are illustrative. The decision memo and the autonomous intake are designed and tested in code but not yet deployed in Foundry.
 
 **Path to deployment.** A pilot with one program office would connect live notice feeds (manufacturer portals and GIDEP), replace notional data with the program's records and repeat every evaluation, and measure the time from notice to decision and the shortages identified before the buy window closed.
 
@@ -288,7 +277,7 @@ src/continuum/        reference implementation (Python)
 foundry/              code deployed to Foundry (transforms, Ontology identifiers)
 data/                 notice registry and manufacturer parts lists (ground truth)
 docs/                 build guide, AIP specification, demo script, manual steps
-tests/                35 automated tests
+tests/                45 automated tests
 ```
 
 ```bash

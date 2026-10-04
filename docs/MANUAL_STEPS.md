@@ -62,13 +62,12 @@ user message).
    the tested `parse_response`, records every unparsable reply) and builds
    `aip/extraction_scores`.
 
-**2c. Drop in the evaluation.** Copy `pending/aip_extraction.py` to
+**2c. Code-repository evaluation (superseded by 2b, D-26; kept for reference).** Copy `pending/aip_extraction.py` to
 `transforms-python/src/myproject/datasets/aip_extraction.py`, set the two RIDs in
 `MODELS`, commit. Build `aip_extraction.py` (all three transforms).
 - **Check / record:** `aip/extraction_scores` has one `POOLED` row per model × mode.
   Copy recall, precision, LTB/LTS accuracy, replacement accuracy and citation coverage
-  into `docs/AIP_LOGIC.md` → *Results*, and onto the deck's AIP evaluation slide
-  (the `[__]` placeholders). `aip/extraction_*_calls` shows any call that failed to parse;
+  into `docs/AIP_LOGIC.md` → *Results*, and onto the deck's AIP evaluation slide. `aip/extraction_*_calls` shows any call that failed to parse;
   report those, do not drop them.
 
 **2d. Build the interactive function.**
