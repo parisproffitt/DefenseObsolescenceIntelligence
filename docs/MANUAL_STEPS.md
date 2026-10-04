@@ -29,7 +29,9 @@ two model RIDs.
 **2a. Add the libraries — DONE 2026-09-27** (`palantir_models 0.2563.0`,
 `language-model-service-api 0.4123.0` on master).
 
-**2b. Run the two models in Pipeline Builder (10 min). NEEDED NOW (D-26).**
+**2b. Run the two models in Pipeline Builder — DONE 2026-10-04** (GPT-5.4 nano and Claude Sonnet; scores in `docs/AIP_LOGIC.md`). Original instructions kept below for reference.
+
+**2b (as run). Run the two models in Pipeline Builder (D-26).**
 The code-repository route is blocked: CI rejects any language-model ID that is not a
 project reference (a made-up ID gets the identical `Jemma:AccessWithoutImportDenied`), and
 the editor offers no model dropdown to import from. Pipeline Builder picks models from a

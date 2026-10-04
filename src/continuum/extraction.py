@@ -107,3 +107,27 @@ def extract(pages: pd.DataFrame, mode: str, complete: Callable[[str, str], str])
     for c in LINE_COLUMNS:
         df[c] = df[c].astype("object").where(df[c].notna(), None)
     return df, pd.DataFrame(calls)
+
+
+def unwrap_llm_output(v) -> tuple[str, str | None]:
+    """(text, error) from a Pipeline Builder *Use LLM* cell with "Include errors" on.
+
+    The cell is a struct {ok, error} (older builds call the text field `value`), read
+    back as a dict, a JSON string, or, with errors off, the plain reply text.
+    """
+    if v is None:
+        return "", "no output"
+    if isinstance(v, str):
+        s = v.strip()
+        if s.startswith("{") and ('"ok"' in s[:20] or '"error"' in s[:20] or '"value"' in s[:20]):
+            try:
+                v = json.loads(s)
+            except ValueError:
+                return v, None
+        else:
+            return v, None
+    if isinstance(v, dict):
+        text = v.get("ok", v.get("value"))
+        err = v.get("error")
+        return ("" if text is None else str(text)), (str(err) if err not in (None, "") else None)
+    return str(v), None

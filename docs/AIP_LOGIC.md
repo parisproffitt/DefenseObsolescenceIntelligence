@@ -71,12 +71,44 @@ Model comparison: run the same notices through a small and a frontier model
 available in AIP. Keep the cheaper model for any step where its scores match.
 Report numbers on the AIP evaluation slide; do not round up.
 
-## Results
-**Not yet measured** (2026-09-26). Fill this table from `aip/extraction_scores`
-(`notice_id = POOLED`) after `docs/MANUAL_STEPS.md` step 2:
+## Results (measured 2026-10-04, `aip/extraction_scores`, notice_id = POOLED, 230-part key)
+Models: **small = GPT-5.4 nano**, **frontier = Claude Sonnet** (exact version: see the
+`extract_notice_lines` pipeline; record it here). Both at the model's default temperature
+(GPT-5 models reject 0). Run in Pipeline Builder *Use LLM* over `aip/extraction_prompts`
+(D-26); parsed and scored in code (`aip_parse.py`).
 
-| Model | Mode | Recall | Precision | LTB exact | LTS exact | Replacements | Citations | Failed calls |
-|---|---|---|---|---|---|---|---|---|
+| Model | Mode | Parts found | Recall | Precision | LTB exact | LTS exact | Replacements | Citations | Calls · failed · unparsable |
+|---|---|---|---|---|---|---|---|---|---|
+| GPT-5.4 nano | document | 230 | 1.0 | 1.0 | 0.4783 | 0.4783 | 0.9917 | 1.0 | 2 · 0 · 0 |
+| GPT-5.4 nano | page | 216 | 0.8609 | 0.9167 | 0.0 | 0.0 | 0.9917 | 1.0 | 16 · 0 · 2 |
+| Claude Sonnet | document | 230 | **1.0** | **1.0** | **1.0** | **1.0** | **1.0** | **1.0** | 2 · 0 · 0 |
+| Claude Sonnet | page | 232 | 1.0 | 0.9914 | 0.0 | 0.1174 | 1.0 | 1.0 | 16 · 0 · 0 |
+
+Unrounded: 0.4782608695652174, 0.8608695652173913, 0.9166666666666666,
+0.9916666666666667, 0.9913793103448276, 0.11739130434782609.
+
+**What the numbers say**
+- **Kept model: Claude Sonnet, document mode.** It is the only run that is exact on every
+  field. GPT-5.4 nano matches it on recall and precision in document mode but not on dates
+  (LTB 0.4783 vs 1.0: it returned no dates for any of PDN2401's 120 parts), so the
+  "cheaper where scores hold" rule does not apply.
+- **Page mode is worse for both models, and that is a design error, not a model one.**
+  Page mode prepends page 1 on the assumption that page 1 states the dates (D-19). It does
+  not in either notice: CAAN-02OLLE763 gives LTB/LTS near the end ("Estimated Effective
+  Dates"), PDN2401 in a later table. Without them in view, page calls returned nulls, and
+  Claude took the trap D-20 predicted: 83 CAAN rows carry LTB = 2026-12-01, the ship date
+  from "will no longer be offered after December 1, 2026". Whole notices fit easily
+  (≤ 10,374 characters), so document mode is the right default here.
+- **Rule breaks seen in page mode** (all would be rejected by the intake gate, D-23,
+  because they do not parse as ordering part numbers): GPT-5.4 nano listed the 16 device
+  *family* names from page 1 (`A3P1000`, `A3P125`, …) as parts; Claude listed "See attached
+  file CAAN-02OLLE763_Affected_CPN_06062025.pdf" as a part twice.
+- **Unparsable replies:** 2 GPT-5.4 nano page replies (`JSONDecodeError: Invalid control
+  character`, a raw newline/tab inside a string); their rows count as missed. A lenient
+  parse (`json.loads(strict=False)`) would recover them; not applied, so these are the
+  numbers as measured.
+
+---|---|---|---|---|---|---|---|---|
 | small | document | | | | | | | |
 | small | page | | | | | | | |
 | frontier | document | | | | | | | |

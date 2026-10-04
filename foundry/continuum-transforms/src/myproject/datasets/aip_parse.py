@@ -12,7 +12,7 @@ import pandas as pd
 from transforms.api import Input, Output, transform
 
 from myproject.continuum.eval_extraction import score
-from myproject.continuum.extraction import LINE_COLUMNS, parse_response
+from myproject.continuum.extraction import LINE_COLUMNS, parse_response, unwrap_llm_output
 from myproject.datasets.paths import AIP, CLEAN
 
 
@@ -21,12 +21,12 @@ def _parse(raw: pd.DataFrame, label: str):
     for r in raw.to_dict("records"):
         rec = {"model": label, "mode": r["mode"], "notice_id": r["notice_id"], "chunk_id": r["chunk_id"],
                "rows": 0, "error": None, "notice_type": None, "caveats": None}
-        out = r.get("llm_output")
-        if isinstance(out, dict):  # "Include errors" output: {value, error}
-            rec["error"] = out.get("error")
-            out = out.get("value")
+        out, err = unwrap_llm_output(r.get("llm_output"))  # "Include errors": {ok, error}
+        rec["error"] = err
+        rec["failed"] = err is not None
+        rec["unparsable"] = False
         try:
-            obj = parse_response(out or "")
+            obj = parse_response(out)
             got = obj.get("lines") or []
             for x in got:
                 row = {c: x.get(c) for c in LINE_COLUMNS}
@@ -34,7 +34,8 @@ def _parse(raw: pd.DataFrame, label: str):
                 lines.append({"model": label, "mode": r["mode"], **row, "chunk_id": r["chunk_id"]})
             rec.update(rows=len(got), notice_type=obj.get("notice_type"), caveats=json.dumps(obj.get("caveats") or []))
         except Exception as e:  # noqa: BLE001 - recorded, not swallowed
-            rec["error"] = (rec["error"] or "") + f"{type(e).__name__}: {e}"[:500]
+            rec["unparsable"] = not rec["failed"]
+            rec["error"] = ((rec["error"] + " | ") if rec["error"] else "") + f"{type(e).__name__}: {e}"[:500]
         calls.append(rec)
     cols = ["model", "mode"] + LINE_COLUMNS + ["chunk_id"]
     ldf = pd.DataFrame(lines, columns=cols)
@@ -63,7 +64,9 @@ def extraction_parse_and_score(small_lines, small_calls, frontier_lines, frontie
         lines, calls = _parse(raw.pandas(), label)
         lo.write_table(lines)
         co.write_table(calls)
-        for mode, g in lines.groupby("mode"):
+        for mode in ("document", "page"):
+            g = lines[lines["mode"] == mode]
+            c = calls[calls["mode"] == mode]
             per, summary = score(g, gt)
             per.insert(0, "mode", mode)
             per.insert(0, "model", label)
@@ -74,8 +77,14 @@ def extraction_parse_and_score(small_lines, small_calls, frontier_lines, frontie
                 "true_positives": int(per.true_positives.sum()),
                 "recall": summary["part_recall"], "precision": summary["part_precision"],
                 "ltb_accuracy": summary["ltb_accuracy"], "lts_accuracy": summary["lts_accuracy"],
+                # Only PDN2401 lists replacements, so its value is the pooled one.
+                "replacement_accuracy": per.set_index("notice_id")["replacement_accuracy"].get("PDN2401"),
+                "citation_coverage": float((g["source_quote"].fillna("").astype(str).str.strip() != "").mean()) if len(g) else None,
+                "calls": int(len(c)), "failed_calls": int(c["failed"].sum()), "unparsable_calls": int(c["unparsable"].sum()),
             }]))
     out = pd.concat(rows, ignore_index=True)
-    for c in ("replacement_accuracy", "citation_coverage"):
-        out[c] = out[c].astype(float)
+    for col in ("replacement_accuracy", "citation_coverage"):
+        out[col] = out[col].astype(float)
+    for col in ("calls", "failed_calls", "unparsable_calls"):
+        out[col] = out[col].astype("Int64")
     scores.write_table(out)

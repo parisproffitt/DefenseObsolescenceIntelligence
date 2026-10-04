@@ -51,3 +51,14 @@ def test_extraction_output_is_scoreable():
     lines, _ = extract(PAGES[PAGES.notice_id == "N1"].head(1), "document", complete)
     _, summary = score(lines, truth)
     assert summary["part_recall"] == 1.0 and summary["lts_accuracy"] == 1.0
+
+
+def test_unwrap_include_errors_struct():
+    from continuum.extraction import unwrap_llm_output
+
+    fenced = '```json\n{"lines": []}\n```'
+    assert unwrap_llm_output({"ok": fenced, "error": None}) == (fenced, None)
+    assert unwrap_llm_output({"ok": None, "error": "rate limited"}) == ("", "rate limited")
+    assert unwrap_llm_output(json.dumps({"ok": fenced, "error": None})) == (fenced, None)
+    assert unwrap_llm_output('{"lines": []}') == ('{"lines": []}', None)  # plain reply, not a struct
+    assert parse_response(unwrap_llm_output({"ok": fenced, "error": None})[0]) == {"lines": []}

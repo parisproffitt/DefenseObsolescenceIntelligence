@@ -172,7 +172,14 @@ def unsupported_numbers(memo: str, input_block: str) -> list[str]:
     return sorted(_numbers(memo) - _numbers(input_block))
 ```
 
-**Evaluation.** Output is scored against the manufacturers' parts lists (230 part numbers) for recall (missed parts), precision (invented parts), date accuracy and replacement accuracy. Two models are compared, and the less expensive model is retained where accuracy is equal ([D-14](DECISIONS.md), [D-19](DECISIONS.md)). *Results will be reported here once the model run completes.*
+**Evaluation.** Output is scored against the manufacturers' parts lists (230 part numbers) for recall (missed parts), precision (invented parts), date accuracy and replacement accuracy. Two models are compared, and the less expensive model is retained where accuracy is equal ([D-14](DECISIONS.md), [D-19](DECISIONS.md)). Measured on the two real notices (230 parts), whole-notice prompts ([D-26](DECISIONS.md)):
+
+| Model | Recall | Precision | Dates exact (LTB / LTS) | Replacements | Citations |
+|---|---|---|---|---|---|
+| **Claude Sonnet (kept)** | **100%** | **100%** | **100% / 100%** | **100%** | **100%** |
+| GPT-5.4 nano | 100% | 100% | 47.8% / 47.8% | 99.2% | 100% |
+
+The small model found every part but returned no dates for any of the Intel notice's 120 parts, so the frontier model is kept. Splitting notices into pages made both models worse, because neither notice states its dates on page 1; full results in [`docs/AIP_LOGIC.md`](docs/AIP_LOGIC.md).
 
 <!-- SCREENSHOT: AIP Logic function and evaluation results (docs/screenshots/aip-logic-eval.png) -->
 
