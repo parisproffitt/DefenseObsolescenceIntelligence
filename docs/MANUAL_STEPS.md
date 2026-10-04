@@ -124,7 +124,8 @@ The MCP created the action (`approve-course-of-action`,
   with quantity **500** and cost **$92,500** and one Engineering Review exist, both
   linked to the case.
 
-## 4. Build Steve's Workshop app (step 5)
+## 4. Build Steve's Workshop app (step 5) — DONE 2026-10-04
+Published. Layout and visual choices: D-27. Action form defaults: D-28 (Approve button in the options header; form shows Impact Case, Status, Course of action, Notes).
 
 **4.0 Value formatting (display only; the MCP object-type tool has no formatting field).**
 Ontology Manager → object type → **Properties** → click the property → **Value formatting**

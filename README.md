@@ -13,13 +13,13 @@ CONTINUUM turns a manufacturer's end-of-life notice into a program decision. It 
 | **Decision supported** | How many parts to buy before the last-time-buy window closes, and whether to start a redesign. |
 | **Approach** | Deterministic code for matching and arithmetic, a calibrated forecast for uncertainty, AIP for reading documents, and a human approval for the decision. |
 | **Demo result** | From one real Microchip notice: a program facing a 10.2-month supply gap, and a bridge-buy option that reduces shortage risk from 93% to 14%. |
-| **Status** | Data pipelines and decision logic run in Foundry, verified against the reference numbers. The Ontology and the approval Action are built on a branch awaiting review. AIP model evaluation and the Workshop application are in progress ([manual steps](docs/MANUAL_STEPS.md)). |
+| **Status** | Built in Foundry: data pipelines and decision logic (numbers equal the tested reference), the Ontology (12 object types, 15 links, merged after review), the *Approve course of action* Action with a self-filling form, and Steve's published Workshop app. The extraction model comparison runs in Pipeline Builder. The intake gate and memo number check are built and tested in code; wiring the schedule, notification and memo panel is the next step ([manual steps](docs/MANUAL_STEPS.md)). |
 
 ---
 
 ## Demonstration
 
-**Video:** *to be added on completion (target: October 5, 2026).*
+**Video:** *link added on submission (October 5, 2026).* **Design review deck:** 34 slides covering the problem, data, architecture, AIP use, the app, the decision and how it was built.
 
 **Steve's Workshop app** — impact cases ranked by supply gap (left), the selected case's coverage, gap and calibrated demand range (middle), and the three costed courses of action with stress-test risk (right):
 

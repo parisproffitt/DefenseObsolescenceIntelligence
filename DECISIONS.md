@@ -12,7 +12,7 @@ Newest decisions are appended at the bottom.
 | Where is ML used, and how is it validated? | D-06, D-07, D-08, D-10 |
 | Where is AIP used, and how is it evaluated? | D-14, D-19, D-21 |
 | What is AI deliberately not allowed to do? | D-04, D-05, D-09, D-21 |
-| How does the operator act on a decision? | D-17, D-18 |
+| How does the operator act on a decision? | D-17, D-18, D-27, D-28 |
 | What runs without a person, and what never does? | D-05, D-23 |
 | What was changed after a first approach failed a check? | D-07 (calibration), D-08 (holding cost), D-10 (fitted trend), D-16 (revises D-12) |
 | What could only be done by hand, and why? | D-15, D-19 |
@@ -195,3 +195,17 @@ Newest decisions are appended at the bottom.
 - **Alternative:** Keep fighting the repository import; or do the whole evaluation in Pipeline Builder (prompt templates, JSON parsing, explode, scoring boards).
 - **Why rejected:** The first depends on a UI element that is not appearing, and possibly on Control Panel settings. The second would re-implement parsing and scoring outside the tests.
 - **If Use LLM shows no models either:** the likely cause is enrollment configuration (AIP capabilities for custom workflows not granted, or no model family enabled); `docs/MANUAL_STEPS.md` 2b step 1 gives the Control Panel path.
+
+### D-27 · Workshop app: one color for urgency, worst case first, no logic in the app
+- **Decision:** Three columns (impact cases, case detail, courses of action) on one page. Cases sort by supply gap, then coverage. The only red is a conditional rule on `severity = CRITICAL` and on `p_shortage_under_stress > 0.5`; object-type icons are neutral gray. Number formats ($1.55M, 14%, 5,640) are set as Ontology value formatting, not in widgets. The options table is driven by `selectedCase` → Search Around → Course of Action; auto-selection is off, so no option is chosen by default. The Approve button sits in the options section header.
+- **Why:** Steve works under a deadline; the worst case must be the first row and every urgent item findable by color alone. Ontology-level formatting makes every app and API show the same value. Keeping arithmetic out of Workshop keeps it in tested transforms (D-09). No default selection makes an approval a deliberate act.
+- **Alternative:** Orange severity icons on every row; formatting per widget; a summary widget under the table; first row auto-selected.
+- **Why rejected:** Color on every row carries no signal; per-widget formatting drifts between apps; the summary repeated what the table and the action form already show; auto-selection would let a click on Approve act on an option nobody chose.
+
+### D-28 · The approval form fills itself from the Ontology
+- **Decision:** *Approve course of action* has 15 parameters because it writes three records. The form shows four: Impact Case and Course of action (filled by Workshop from the selected rows), Status (default `APPROVED`) and optional Notes. The rest default from object properties and are hidden: Case ID, Program ID, Part number (Impact Case); COA key, Quantity = buy quantity, Estimated cost = procurement USD ($92,500 for Heron), Justification = the option summary (Course of Action); Review type = `REDESIGN`.
+- **Why:** Hand-typed quantities and costs are where a purchase request drifts from the analysis behind it. Copying them makes the decision one click and the records consistent by construction.
+- **Alternative:** Leave every parameter visible for the engineer to fill in.
+- **Why rejected:** Fifteen fields, eleven of which the system already knows, invite transcription errors and slow the one step that must stay human.
+- **Known gap:** *Requested by/at* and *Opened by/at* are plain text and date parameters; the form editor offers no "current user/time" default for them, so they are hidden and optional. Mapping them to the submitting user and submission time in the action rules is the next step, so the approver is recorded by the system rather than typed.
+
