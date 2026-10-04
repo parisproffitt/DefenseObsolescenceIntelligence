@@ -1,33 +1,56 @@
 # Demo script (target 4:40, hard limit 5:00)
 
-Narration is ~135 words per minute. Every number below is produced by code in Foundry
-and pinned by tests; say them exactly. Screens marked **[MANUAL]** depend on
-`docs/MANUAL_STEPS.md` being done; the fallback in brackets shows the same thing
-without it.
+Matches what is built as of 2026-10-04. Narration is about 135 words per minute
+(~610 spoken words). Every number is produced by code in Foundry and pinned by tests;
+say them exactly. `[AIP SCORES]` is filled from `aip/extraction_scores` (D-26); if the
+scores are not in by recording time, use the fallback line in scene 4.
 
-**The through-line.** The brief assesses how AIP is integrated with Foundry, so the video
-shows AIP at the three points where it does work (reading the notice, choosing the model,
-writing the memo on the decision screen) and says, each time, what AIP is not allowed to
-do. Scene 2 states this up front; scene 8 pays it off (D-21).
+**The through-line.** The brief asks how AIP is used with Foundry. The video shows AIP
+where language is the work (reading the notice, chosen by measured accuracy), the
+Ontology as the shared model, code for every number, and one human approval written
+back by an Ontology Action. Each time AIP appears, say what it is not allowed to do.
+
+## Script
 
 | # | Time | Screen | Narration |
 |---|---|---|---|
-| 1 | 0:00–0:20 | Deck cover, then the Microchip notice CAAN-02OLLE763 (PDF) | "Defense aircraft fly for thirty years; the chips inside them are supported for five. On June 6th 2025 Microchip discontinued 110 ProASIC3 FPGA part numbers, last-time buy December 1st. An engineer, Steve, has to work out which programs that hits, before the window closes." |
-| 2 | 0:20–0:45 | Deck slide *How Foundry and AIP are used across the workflow* | "Here's the whole workflow on Foundry and AIP. Foundry transforms clean the data and do the math, the Ontology connects notice to part to program, and AIP does the three jobs that are language: reading the notice, choosing which model to trust, and writing the decision memo. The engineer makes the call through an Ontology Action." |
-| 3 | 0:45–1:25 | **[MANUAL]** AIP Logic `extractNoticeLines` run on the notice; rows with quotes [fallback: deck slide *What AIP does*] | "First, AIP reads the notice. Every row it returns has a part number exactly as printed, the dates, and a verbatim quote as evidence. It also copied this sentence word for word: Microchip may cancel the notice if a new assembly site qualifies. That changes the decision, so Steve has to see it. [AIP RESULT SENTENCE from `aip/extraction_scores`: recall, precision and date accuracy for the small and the frontier model, and which one was kept. If not run by recording day: "Each run is scored against the manufacturers' 230 real part numbers."]" |
-| 4 | 1:25–1:50 | Foundry lineage `raw/` → `clean/` → `analysis/`, then `bom_notice_matches` (5 rows) and Petrel's review flag | "Program data arrives messy. Python transforms clean it, and an exact join, not AI, finds five affected BOM lines. Petrel uses the same chip in a different package that isn't discontinued: a fuzzy match would raise a false alarm. Here it's a review flag." |
-| 5 | 1:50–2:30 | **[MANUAL]** Workshop app, Heron selected [fallback: Object Explorer on the Heron impact case] | "Heron, an airlift fleet, is critical. 312 units on hand cover 13.8 months. The last-time buy closes in 5.7 months, and a redesign takes 24. So even starting a redesign today, Heron runs out 10.2 months before it's ready." |
-| 6 | 2:30–2:55 | Same page: forecast range cards (337 / 573 / 880) | "How many will it need? Demand is lumpy, so the forecast is a range: 337 to 880 units, middle 573. I checked the range is honest: on held-out data, calibrated, it held 82% of outcomes against an 80% target." |
-| 7 | 2:55–3:35 | COA table | "Three options, priced by code. A life-of-type buy of 5,640 units has a 10% shortage risk, but if an aging fleet uses 5% more a year, that's 99%. Redesign alone is 93%. A bridge buy of 500 plus the redesign costs about the same, $1.55 million, with 14% risk, 18% under stress." |
-| 8 | 3:35–4:10 | **[MANUAL]** Workshop memo panel beside *Approve* [fallback: `draftDecisionMemo` test run in AIP Logic] | "Then AIP writes the memo Steve would have written by hand, straight from these Ontology objects. It lays out the options and the deadline, but it can't recommend one, and code checks that every number in it matches the Ontology before it's shown." |
-| 9 | 4:10–4:35 | **[MANUAL]** Click *Approve course of action* → status flips; Procurement Request (500 units, $92,500) and Engineering Review appear [fallback: the action type in Ontology Manager] | "Steve makes the call. One Action records the decision, opens a purchase request for 500 units and an engineering review. Code did the arithmetic, ML the uncertainty, AIP the language, and the engineer the judgment." |
-| 10 | 4:35–4:45 | Deck close slide | "That's CONTINUUM: one notice in, one program decision out." |
+| 1 | 0:00–0:20 | Deck: cover, then *Defense systems outlive the parts inside them* | "Military aircraft fly for twenty-five to thirty years. The commercial chips inside them are supported for four to seven. So every few months, a manufacturer discontinues a part, and an engineer has to work out what that means for every program that uses it, before the last order date." |
+| 2 | 0:20–0:40 | Deck: *A real end-of-life notice drives the demo* | "This is a real one. Microchip notice CAAN-02OLLE763 discontinues 110 FPGA part numbers, last-time buy December 1st, 2025. It also says the notice may be cancelled if a new assembly site qualifies. Steve, our DMSMS engineer, has to catch that too." |
+| 3 | 0:40–1:05 | Deck: *How Foundry and AIP are used across the workflow* | "Here's the design. AIP reads the documents. Python transforms in Foundry clean the data and do every calculation. The Ontology connects notice, part, program and decision. And the engineer makes the call through an Ontology Action. Code for numbers, AI for language, a person for judgment." |
+| 4 | 1:05–1:40 | Pipeline Builder canvas: `extraction_prompts` → two *Use LLM* nodes → two outputs. Click a Use LLM node; show the output with the caveat copied verbatim | "AIP reads the notice in Pipeline Builder. I run two models on the same prompts, a small one and Claude Sonnet, and score both against the manufacturers' 230 real part numbers. [AIP SCORES: e.g. 'The small model found X percent of parts, Sonnet Y percent, with no invented parts, so I keep ___.'] Every row carries a verbatim quote, and the cancellation caveat comes through word for word." *Fallback:* "…and every run is scored field by field against the manufacturers' 230 real part numbers." |
+| 5 | 1:40–2:05 | Foundry Data Lineage: `raw/` → `clean/` → `analysis/`; then `bom_notice_matches` (5 rows) | "Program data arrives messy, the way a customer hands it over. Transforms clean it, and an exact match, not AI, finds five affected lines across three programs. Petrel uses the same chip in a different package that isn't discontinued, so it's flagged for review, not matched." |
+| 6 | 2:05–2:40 | Workshop app, left column, then click **Heron · A3P1000** | "This is Steve's app. Every affected case, worst first; only critical is red. Heron, an airlift fleet: 312 units on hand cover 13.8 months. The buy window closes in 5.7. A redesign takes 24. So even starting today, Heron runs out 10.2 months before the redesign is ready." |
+| 7 | 2:40–3:00 | Same screen: the forecast cards 337 / 573 / 880 | "How many will it need? Spares demand is lumpy, so the forecast is a range: 337 to 880 units. I calibrated it on held-out data; it holds 82 percent of outcomes against an 80 percent target." |
+| 8 | 3:00–3:30 | Right column: the three options; point at the red 99% | "Three options, priced by code. A life-of-type buy looks safe at 10 percent shortage risk, but if an aging fleet uses 5 percent more a year, that becomes 99. Redesign alone: 93. A bridge buy of 500 plus the redesign costs about the same, 1.55 million, at 14 percent, and 18 under stress." |
+| 9 | 3:30–4:00 | Click **Bridge buy + redesign** → **Approve COA** → form shows Heron, APPROVED, Bridge buy → **Submit** → Heron's status changes to APPROVED | "Steve chooses. The form fills itself from the Ontology: quantity, cost, program, justification. He never retypes what the system knows. One Action records the decision and opens the purchase request and the engineering review together." |
+| 10 | 4:00–4:25 | Deck: *What runs on its own, and what never does* | "Everything before this click can run on its own: a new notice arrives, AIP reads it, a code gate holds anything it can't verify, and Steve is notified. The approval never automates. A last-time buy can't be cancelled." |
+| 11 | 4:25–4:40 | Deck: *Pilot CONTINUUM with one program office* | "Next step: a pilot with one program office, on their own data, measuring hours from notice to decision. That's CONTINUUM: one notice in, one program decision out." |
 
-**Word count check:** ~600 words ≈ 4:30 at 135 wpm, leaving ~15 s for clicks and pauses.
+## Shot list (record each as its own clip)
+
+Open these tabs in this order before recording, signed in, at 110–125% browser zoom,
+bookmarks bar hidden, notifications off:
+
+1. **Deck**, presentation mode, on the cover. Slides used: cover, *Defense systems outlive…*, *A real end-of-life notice…*, *How Foundry and AIP are used…*, *What runs on its own…*, *Pilot CONTINUUM…*
+2. **Pipeline Builder** `aip/extract_notice_lines`, canvas fitted to screen. Second take: a Use LLM node open with its trial-run output showing the caveat.
+3. **Data Lineage** for `analysis/coas` (raw → clean → analysis visible), then the `analysis/bom_notice_matches` preview (5 rows).
+4. **Workshop app** in View mode, Heron selected, no option selected.
+
+| Clip | Tab | Action | Length |
+|---|---|---|---|
+| A | Deck | Cover → problem → notice → platform (advance on the narration beats) | ~1:05 |
+| B | Pipeline Builder | Hold on the canvas 5 s; click the Use LLM node; scroll to the output | ~0:35 |
+| C | Lineage | Pan raw → clean → analysis; open `bom_notice_matches` | ~0:25 |
+| D | Workshop | Hover the CRITICAL row; click Heron; hold on the cards; hold on the forecast | ~0:55 |
+| E | Workshop | Hover the red 99%; click Bridge buy; Approve COA; pause on the form; Submit; show status APPROVED | ~1:00 |
+| F | Deck | Autonomy slide → close slide | ~0:40 |
 
 ## Before recording
-- Run `pytest` and `python scripts/build_all.py`; the printout must match the numbers above.
-- In Foundry, re-query `analysis/coas` and `analysis/impact_cases` (SQL in
-  `docs/FOUNDRY_BUILD.md`, Phase 3) to confirm nothing moved.
-- Run `draftDecisionMemo` on Heron once and check its numbers against `docs/AIP_LOGIC.md` → *Expected memo for Heron*.
-- Reset Heron's status to `OPEN` (run the action with status `OPEN`, or revert the edit) so the approval can be shown live.
+- Run `pytest` (44 tests) so the numbers above are re-confirmed.
+- In Workshop, confirm Heron's status is `OPEN`. Approving is the last clip; if you need a
+  second take, set Heron back with the action (status `OPEN`) and expect a second purchase
+  request object; delete it afterwards in Object Explorer.
+- Record the voice separately (quiet room, mic or phone close), one scene per take, then cut
+  the screen clips to the voice. Add captions; zoom in on 10.2, 82%, 99% and the form.
+- Export 1080p. Upload to YouTube as **Unlisted**, check it plays at 1080p, then email the
+  link to USG-AIP-DEMO@Palantir.com with the GitHub link and the deck.

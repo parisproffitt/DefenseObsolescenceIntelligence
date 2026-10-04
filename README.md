@@ -29,10 +29,14 @@ CONTINUUM turns a manufacturer's end-of-life notice into a program decision. It 
 
 <img src="docs/screenshots/action-approve.png" alt="Approve course of action form, pre-filled with the Heron case and the bridge buy option" width="480">
 
+**AIP extraction, two models side by side** — Pipeline Builder runs GPT-5.4 nano and Claude Sonnet as *Use LLM* steps over the same 18 prompts; a tested code transform scores both against the 230-part answer key (D-26):
+
+![Pipeline Builder with two Use LLM steps](docs/screenshots/aip-pipeline.png)
+
 | Screen | Shows |
 |---|---|
 | Decision memo *(screenshot to be added)* | The memo AIP drafts from the Ontology, beside *Approve* |
-| AIP evaluation *(screenshot to be added)* | Extraction accuracy against the manufacturers' parts lists |
+| AIP evaluation | Extraction accuracy against the manufacturers' parts lists (scores below, from `aip/extraction_scores`) |
 | Data lineage *(screenshot to be added)* | Raw exports → clean tables → analysis in Foundry |
 
 <!-- Screenshots: docs/screenshots/{workshop-cases,workshop-heron,workshop-memo,action-approve,aip-logic-eval,lineage}.png -->
