@@ -2,8 +2,7 @@
 
 Matches what is built as of 2026-10-04. Narration is about 135 words per minute
 (~610 spoken words). Every number is produced by code in Foundry and pinned by tests;
-say them exactly. `[AIP SCORES]` is filled from `aip/extraction_scores` (D-26); if the
-scores are not in by recording time, use the fallback line in scene 4.
+say them exactly. AIP scores are from `aip/extraction_scores` (D-26).
 
 **The through-line.** The brief asks how AIP is used with Foundry. The video shows AIP
 where language is the work (reading the notice, chosen by measured accuracy), the
@@ -17,7 +16,7 @@ back by an Ontology Action. Each time AIP appears, say what it is not allowed to
 | 1 | 0:00–0:20 | Deck: cover, then *Defense systems outlive the parts inside them* | "Military aircraft fly for twenty-five to thirty years. The commercial chips inside them are supported for four to seven. So every few months, a manufacturer discontinues a part, and an engineer has to work out what that means for every program that uses it, before the last order date." |
 | 2 | 0:20–0:40 | Deck: *A real end-of-life notice drives the demo* | "This is a real one. Microchip notice CAAN-02OLLE763 discontinues 110 FPGA part numbers, last-time buy December 1st, 2025. It also says the notice may be cancelled if a new assembly site qualifies. Steve, our DMSMS engineer, has to catch that too." |
 | 3 | 0:40–1:05 | Deck: *How Foundry and AIP are used across the workflow* | "Here's the design. AIP reads the documents. Python transforms in Foundry clean the data and do every calculation. The Ontology connects notice, part, program and decision. And the engineer makes the call through an Ontology Action. Code for numbers, AI for language, a person for judgment." |
-| 4 | 1:05–1:40 | Pipeline Builder canvas: `extraction_prompts` → two *Use LLM* nodes → two outputs. Click a Use LLM node; show the output with the caveat copied verbatim | "AIP reads the notice in Pipeline Builder. I run two models on the same prompts, a small one and Claude Sonnet, and score both against the manufacturers' 230 real part numbers. [AIP SCORES: e.g. 'The small model found X percent of parts, Sonnet Y percent, with no invented parts, so I keep ___.'] Every row carries a verbatim quote, and the cancellation caveat comes through word for word." *Fallback:* "…and every run is scored field by field against the manufacturers' 230 real part numbers." |
+| 4 | 1:05–1:40 | Pipeline Builder canvas: `extraction_prompts` → two *Use LLM* nodes → two outputs; then the deck slide *Two models, 230 real parts: Sonnet is kept* | "AIP reads the notice in Pipeline Builder. I ran two models on the same prompts, GPT-5.4 nano and Claude Sonnet, and scored both against the manufacturers' 230 real part numbers. Both found every part. But the small model dropped every date on the Intel notice, so I keep Sonnet: 100 percent on every field. And every row carries a verbatim quote; the cancellation caveat comes through word for word." |
 | 5 | 1:40–2:05 | Foundry Data Lineage: `raw/` → `clean/` → `analysis/`; then `bom_notice_matches` (5 rows) | "Program data arrives messy, the way a customer hands it over. Transforms clean it, and an exact match, not AI, finds five affected lines across three programs. Petrel uses the same chip in a different package that isn't discontinued, so it's flagged for review, not matched." |
 | 6 | 2:05–2:40 | Workshop app, left column, then click **Heron · A3P1000** | "This is Steve's app. Every affected case, worst first; only critical is red. Heron, an airlift fleet: 312 units on hand cover 13.8 months. The buy window closes in 5.7. A redesign takes 24. So even starting today, Heron runs out 10.2 months before the redesign is ready." |
 | 7 | 2:40–3:00 | Same screen: the forecast cards 337 / 573 / 880 | "How many will it need? Spares demand is lumpy, so the forecast is a range: 337 to 880 units. I calibrated it on held-out data; it holds 82 percent of outcomes against an 80 percent target." |
@@ -32,7 +31,7 @@ Open these tabs in this order before recording, signed in, at 110–125% browser
 bookmarks bar hidden, notifications off:
 
 1. **Deck**, presentation mode, on the cover. Slides used: cover, *Defense systems outlive…*, *A real end-of-life notice…*, *How Foundry and AIP are used…*, *What runs on its own…*, *Pilot CONTINUUM…*
-2. **Pipeline Builder** `aip/extract_notice_lines`, canvas fitted to screen. Second take: a Use LLM node open with its trial-run output showing the caveat.
+2. **Pipeline Builder** `aip/extract_notice_lines`, canvas fitted to screen. Second take: a Use LLM node open with its output showing the caveat. Deck slide 28 (*Two models, 230 real parts*) for the scores.
 3. **Data Lineage** for `analysis/coas` (raw → clean → analysis visible), then the `analysis/bom_notice_matches` preview (5 rows).
 4. **Workshop app** in View mode, Heron selected, no option selected.
 
