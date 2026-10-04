@@ -27,7 +27,7 @@ CONTINUUM turns a manufacturer's end-of-life notice into a program decision. It 
 
 **One-click approval** — the *Approve course of action* Ontology Action opens pre-filled from the selected case and option; the purchase request and engineering review it creates are filled from those objects, not typed:
 
-![Approve course of action form](docs/screenshots/action-approve.png)
+<img src="docs/screenshots/action-approve.png" alt="Approve course of action form, pre-filled with the Heron case and the bridge buy option" width="480">
 
 | Screen | Shows |
 |---|---|
